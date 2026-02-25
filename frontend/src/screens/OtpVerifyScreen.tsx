@@ -21,7 +21,8 @@ import {
   Platform,
   Animated,
 } from 'react-native';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { ConfirmationResult } from 'firebase/auth';
+import { firebaseAuth } from '../services/firebase';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatIsraeliPhone, interpolate } from '../theme/rtl';
 import he from '../i18n/he.json';
 import { AUTH } from '../../config/constants';
@@ -35,7 +36,7 @@ const RESEND_COOLDOWN_SECONDS = 60;
 
 interface OtpVerifyScreenProps {
   phone: string;                                          // Raw phone entered by user
-  confirmation: FirebaseAuthTypes.ConfirmationResult;     // From Firebase signInWithPhoneNumber
+  confirmation: ConfirmationResult;                        // From Firebase signInWithPhoneNumber
   sessionToken: string;                                   // From backend /otp/request
   onSuccess: (userId: string, isNewUser: boolean) => void;
   onBack: () => void;
@@ -156,7 +157,7 @@ export default function OtpVerifyScreen({
       await confirmation.confirm(code);
 
       // Get Firebase ID token to send to our backend
-      const firebaseIdToken = await auth().currentUser?.getIdToken();
+      const firebaseIdToken = await firebaseAuth.currentUser?.getIdToken();
       if (!firebaseIdToken) throw new Error('Failed to get Firebase ID token');
 
       // Register/upsert user on backend
@@ -261,8 +262,6 @@ export default function OtpVerifyScreen({
                 error ? styles.otpBoxError : null,
               ]}
               value={digit}
-              onChangeText={(val) => handleDigitChange(val, index)}
-              onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
               onChangeText={(val) => {
                 // Handle paste of full code
                 if (val.length > 1) {
@@ -271,6 +270,7 @@ export default function OtpVerifyScreen({
                   handleDigitChange(val, index);
                 }
               }}
+              onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, index)}
               keyboardType="number-pad"
               maxLength={6}  // Allow paste
               textAlign="center"
@@ -353,13 +353,15 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   logo: {
-    fontSize: 32,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: '900',
     color: Colors.primary,
     marginBottom: Spacing.lg,
   },
   title: {
-    ...Typography.h2,
+    fontSize: 22,
+    fontWeight: '800',
+    color: Colors.textPrimary,
     textAlign: 'center',
     marginBottom: Spacing.sm,
   },
@@ -374,8 +376,8 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
   },
   otpBox: {
-    width: 48,
-    height: 58,
+    width: 46,
+    height: 56,
     borderRadius: BorderRadius.md,
     borderWidth: 2,
     borderColor: Colors.border,
@@ -384,19 +386,19 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.textPrimary,
     textAlign: 'center',
-    ...Shadows.sm,
   },
   otpBoxFilled: {
     borderColor: Colors.primary,
     backgroundColor: Colors.primaryLight,
+    color: Colors.primary,
   },
   otpBoxError: {
     borderColor: Colors.error,
     backgroundColor: '#FFF0EE',
   },
   hintText: {
-    ...Typography.caption,
-    color: Colors.textSecondary,
+    fontSize: 12,
+    color: Colors.textDisabled,
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
@@ -425,7 +427,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.lg,
   },
   resendText: {
-    ...Typography.body,
+    fontSize: 14,
     color: Colors.primary,
     textAlign: 'center',
     textDecorationLine: 'underline',

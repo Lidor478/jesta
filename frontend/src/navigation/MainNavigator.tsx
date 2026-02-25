@@ -46,8 +46,8 @@ export type MainStackParamList = {
 
 type TabParamList = {
   HomeFeed: undefined;
-  PostTask: undefined;
-  Transactions: undefined;
+  Community: undefined;
+  Messages: undefined;
   Profile: undefined;
 };
 
@@ -97,28 +97,24 @@ function MainTabs() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          direction: 'rtl',
+          flexDirection: 'row-reverse' as const,
+          backgroundColor: Colors.background,
           borderTopWidth: 1,
           borderTopColor: Colors.border,
-          elevation: 8,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.08,
-          shadowRadius: 4,
-          paddingBottom: Spacing.sm,
-          paddingTop: Spacing.xs,
-          height: 64,
+          paddingTop: 8,
+          paddingBottom: 20,
+          height: 68,
         },
         tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarInactiveTintColor: Colors.primary,
+        tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
       }}
     >
       <Tab.Screen
         name="HomeFeed"
         options={{
-          tabBarLabel: he.home.nearby_tasks,
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, textAlign: 'center' }}>{'🏠'}</Text>,
+          tabBarLabel: 'משימות',
+          tabBarIcon: () => <Text style={{ fontSize: 20, textAlign: 'center' }}>{'🗂️'}</Text>,
         }}
       >
         {({ navigation }) => (
@@ -132,10 +128,10 @@ function MainTabs() {
       </Tab.Screen>
 
       <Tab.Screen
-        name="PostTask"
+        name="Community"
         options={{
-          tabBarLabel: he.tasks.post_task,
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, textAlign: 'center' }}>{'➕'}</Text>,
+          tabBarLabel: 'קהילה',
+          tabBarIcon: () => <Text style={{ fontSize: 20, textAlign: 'center' }}>{'❤️'}</Text>,
         }}
       >
         {({ navigation }) => (
@@ -147,11 +143,11 @@ function MainTabs() {
       </Tab.Screen>
 
       <Tab.Screen
-        name="Transactions"
+        name="Messages"
         component={TransactionHistoryScreen}
         options={{
-          tabBarLabel: he.escrow.pay_title,
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, textAlign: 'center' }}>{'💰'}</Text>,
+          tabBarLabel: 'הודעות',
+          tabBarIcon: () => <Text style={{ fontSize: 20, textAlign: 'center' }}>{'💬'}</Text>,
         }}
       />
 
@@ -160,7 +156,7 @@ function MainTabs() {
         component={ProfileScreen}
         options={{
           tabBarLabel: he.profile.title,
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, textAlign: 'center' }}>{'👤'}</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 20, textAlign: 'center' }}>{'👤'}</Text>,
         }}
       />
     </Tab.Navigator>

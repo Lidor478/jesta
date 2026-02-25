@@ -20,7 +20,8 @@ import {
   StatusBar,
   Alert,
 } from 'react-native';
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { signInWithPhoneNumber, RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
+import { firebaseAuth } from '../services/firebase';
 import {
   Colors,
   Typography,
@@ -35,7 +36,7 @@ import { AUTH } from '../../config/constants';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PhoneInputScreenProps {
-  onOtpSent: (phone: string, confirmation: FirebaseAuthTypes.ConfirmationResult, sessionToken: string) => void;
+  onOtpSent: (phone: string, confirmation: ConfirmationResult, sessionToken: string) => void;
   onBack?: () => void;
 }
 
@@ -105,11 +106,17 @@ export default function PhoneInputScreen({ onOtpSent, onBack }: PhoneInputScreen
         ? `+${digits}`
         : `+972${digits.slice(1)}`;
 
+      // Set up invisible reCAPTCHA verifier for web phone auth
+      const recaptchaVerifier = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
+        size: 'invisible',
+      });
+
       // Firebase sends the SMS and returns a confirmation object
-      const confirmation = await auth().signInWithPhoneNumber(fullPhone);
+      const confirmation = await signInWithPhoneNumber(firebaseAuth, fullPhone, recaptchaVerifier);
 
       onOtpSent(phone, confirmation, data.sessionToken);
-    } catch {
+    } catch (err) {
+      console.error('[PhoneInput] Error:', err);
       setError(he.errors.network);
     } finally {
       setIsLoading(false);
@@ -124,6 +131,8 @@ export default function PhoneInputScreen({ onOtpSent, onBack }: PhoneInputScreen
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
+      {/* Invisible reCAPTCHA container for web phone auth */}
+      {Platform.OS === 'web' && <View nativeID="recaptcha-container" />}
 
       <KeyboardAvoidingView
         style={styles.container}
@@ -157,7 +166,7 @@ export default function PhoneInputScreen({ onOtpSent, onBack }: PhoneInputScreen
             {/* Phone text input */}
             <TextInput
               ref={inputRef}
-              style={styles.phoneInput}
+              style={[styles.phoneInput, { writingDirection: 'ltr' }]}
               value={phone}
               onChangeText={handlePhoneChange}
               placeholder={he.auth.phone_placeholder}
@@ -165,9 +174,7 @@ export default function PhoneInputScreen({ onOtpSent, onBack }: PhoneInputScreen
               keyboardType="phone-pad"
               maxLength={13}
               autoFocus
-              // RTL-specific
               textAlign="right"
-              writingDirection="ltr"  // Phone numbers are LTR even in RTL UI
               returnKeyType="done"
               onSubmitEditing={canSubmit ? handleSendOtp : undefined}
             />
@@ -222,6 +229,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
+    paddingTop: 70,
     alignItems: 'stretch',
   },
   backButton: {
@@ -235,31 +243,35 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: Spacing.xxl,
     marginBottom: Spacing.xl,
   },
   logo: {
-    fontSize: 32,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: '900',
     color: Colors.primary,
     marginBottom: Spacing.lg,
   },
   title: {
-    ...Typography.h2,
-    textAlign: 'center',
+    fontSize: 22,
+    fontWeight: '800',
+    color: Colors.textPrimary,
+    textAlign: 'right',
+    alignSelf: 'stretch',
     marginBottom: Spacing.sm,
   },
   subtitle: {
-    ...Typography.body,
+    fontSize: 14,
     color: Colors.textSecondary,
-    textAlign: 'center',
+    textAlign: 'right',
+    alignSelf: 'stretch',
   },
   card: {
     backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
     marginBottom: Spacing.lg,
-    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   inputLabel: {
     ...Typography.label,
@@ -294,13 +306,16 @@ const styles = StyleSheet.create({
   prefixText: {
     ...Typography.label,
     color: Colors.primary,
+    fontWeight: '700',
   },
   phoneInput: {
     flex: 1,
-    ...Typography.h3,
+    fontSize: 18,
+    fontWeight: '400',
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
     color: Colors.textPrimary,
+    letterSpacing: 2,
   },
   errorContainer: {
     flexDirection: 'row-reverse',
@@ -322,22 +337,26 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     backgroundColor: Colors.primary,
-    paddingVertical: Spacing.md + 4,
+    paddingVertical: 17,
     borderRadius: BorderRadius.pill,
     alignItems: 'center',
     marginBottom: Spacing.lg,
-    ...Shadows.md,
+    ...Platform.select({
+      ios: { shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
+      android: { elevation: 4 },
+    }),
   },
   sendButtonDisabled: {
     backgroundColor: Colors.textDisabled,
-    ...Shadows.sm,
   },
   sendButtonText: {
-    ...Typography.button,
+    fontSize: 16,
+    fontWeight: '700',
     color: Colors.textInverse,
+    textAlign: 'center',
   },
   legalText: {
-    ...Typography.caption,
+    fontSize: 11,
     color: Colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: Spacing.lg,

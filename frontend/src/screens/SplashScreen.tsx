@@ -11,18 +11,19 @@ import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   FlatList,
   TouchableOpacity,
   Animated,
   StatusBar,
   SafeAreaView,
   ViewToken,
+  Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme/rtl';
 import he from '../i18n/he.json';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const MAX_CONTENT_WIDTH = 480;
 
 // ─── Slide Data ───────────────────────────────────────────────────────────────
 
@@ -40,21 +41,21 @@ const SLIDES: Slide[] = [
     emoji: '🙋',
     title: he.onboarding.slide1_title,
     body: he.onboarding.slide1_body,
-    bgColor: '#E8F0FE',
+    bgColor: '#EFF6FF',
   },
   {
     id: '2',
     emoji: '💼',
     title: he.onboarding.slide2_title,
     body: he.onboarding.slide2_body,
-    bgColor: '#E8F5E9',
+    bgColor: '#D1FAE5',
   },
   {
     id: '3',
     emoji: '❤️',
     title: he.onboarding.slide3_title,
     body: he.onboarding.slide3_body,
-    bgColor: '#FFF8E1',
+    bgColor: '#FEF3C7',
   },
 ];
 
@@ -68,6 +69,11 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
+  const { width: windowWidth } = useWindowDimensions();
+
+  const slideWidth = Platform.OS === 'web'
+    ? Math.min(windowWidth, MAX_CONTENT_WIDTH)
+    : windowWidth;
 
   const isLastSlide = activeIndex === SLIDES.length - 1;
 
@@ -91,88 +97,92 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
 
-      {/* Skip button (top-left in RTL = top-right visually) */}
-      <TouchableOpacity style={styles.skipButton} onPress={onComplete}>
-        <Text style={styles.skipText}>{he.onboarding.skip}</Text>
-      </TouchableOpacity>
+      <View style={[styles.content, { maxWidth: MAX_CONTENT_WIDTH, width: '100%' }]}>
+        {/* Skip button (top-left in RTL = top-right visually) */}
+        <TouchableOpacity style={styles.skipButton} onPress={onComplete}>
+          <Text style={styles.skipText}>{he.onboarding.skip}</Text>
+        </TouchableOpacity>
 
-      {/* Logo */}
-      <View style={styles.logoContainer}>
-        <Text style={styles.logoText}>{he.app.name}</Text>
-        <Text style={styles.taglineText}>{he.app.tagline}</Text>
-      </View>
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <Text style={styles.logoText}>{he.app.name}</Text>
+          <Text style={styles.taglineText}>{he.app.tagline}</Text>
+        </View>
 
-      {/* Slides */}
-      <Animated.FlatList
-        ref={flatListRef}
-        data={SLIDES}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        // RTL: flip the list so slides go right-to-left
-        inverted={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
-        )}
-        onViewableItemsChanged={handleViewableChange}
-        viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-        renderItem={({ item }: { item: Slide }) => (
-          <SlideCard slide={item} />
-        )}
-      />
+        {/* Slides */}
+        <Animated.FlatList
+          ref={flatListRef}
+          data={SLIDES}
+          keyExtractor={(item) => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          inverted={false}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+            { useNativeDriver: false }
+          )}
+          onViewableItemsChanged={handleViewableChange}
+          viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
+          style={{ width: slideWidth }}
+          renderItem={({ item }: { item: Slide }) => (
+            <SlideCard slide={item} slideWidth={slideWidth} />
+          )}
+        />
 
-      {/* Dot indicators */}
-      <View style={styles.dotsContainer}>
-        {SLIDES.map((_, i) => {
-          const opacity = scrollX.interpolate({
-            inputRange: [(i - 1) * SCREEN_WIDTH, i * SCREEN_WIDTH, (i + 1) * SCREEN_WIDTH],
-            outputRange: [0.3, 1, 0.3],
-            extrapolate: 'clamp',
-          });
-          const width = scrollX.interpolate({
-            inputRange: [(i - 1) * SCREEN_WIDTH, i * SCREEN_WIDTH, (i + 1) * SCREEN_WIDTH],
-            outputRange: [8, 24, 8],
-            extrapolate: 'clamp',
-          });
-          return (
-            <Animated.View
-              key={i}
-              style={[styles.dot, { opacity, width }]}
-            />
-          );
-        })}
-      </View>
+        {/* Dot indicators */}
+        <View style={styles.dotsContainer}>
+          {SLIDES.map((_, i) => {
+            const opacity = scrollX.interpolate({
+              inputRange: [(i - 1) * slideWidth, i * slideWidth, (i + 1) * slideWidth],
+              outputRange: [0.3, 1, 0.3],
+              extrapolate: 'clamp',
+            });
+            const width = scrollX.interpolate({
+              inputRange: [(i - 1) * slideWidth, i * slideWidth, (i + 1) * slideWidth],
+              outputRange: [8, 24, 8],
+              extrapolate: 'clamp',
+            });
+            return (
+              <Animated.View
+                key={i}
+                style={[styles.dot, { opacity, width }]}
+              />
+            );
+          })}
+        </View>
 
-      {/* CTA Button */}
-      <TouchableOpacity style={styles.ctaButton} onPress={handleNext}>
-        <Text style={styles.ctaText}>
-          {isLastSlide ? he.onboarding.get_started : he.common.next}
+        {/* CTA Button */}
+        <TouchableOpacity style={styles.ctaButton} onPress={handleNext}>
+          <Text style={styles.ctaText}>
+            {isLastSlide ? he.onboarding.get_started : he.common.next}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Terms note */}
+        <Text style={styles.termsText}>
+          {he.auth.agree_terms}{' '}
+          <Text style={styles.termsLink}>{he.auth.terms}</Text>
+          {' '}{he.auth.and}{' '}
+          <Text style={styles.termsLink}>{he.auth.privacy}</Text>
         </Text>
-      </TouchableOpacity>
-
-      {/* Terms note */}
-      <Text style={styles.termsText}>
-        {he.auth.agree_terms}{' '}
-        <Text style={styles.termsLink}>{he.auth.terms}</Text>
-        {' '}{he.auth.and}{' '}
-        <Text style={styles.termsLink}>{he.auth.privacy}</Text>
-      </Text>
+      </View>
     </SafeAreaView>
   );
 }
 
 // ─── Slide Card ───────────────────────────────────────────────────────────────
 
-function SlideCard({ slide }: { slide: Slide }) {
+function SlideCard({ slide, slideWidth }: { slide: Slide; slideWidth: number }) {
   return (
-    <View style={[styles.slide, { width: SCREEN_WIDTH }]}>
-      <View style={[styles.emojiContainer, { backgroundColor: slide.bgColor }]}>
-        <Text style={styles.emoji}>{slide.emoji}</Text>
+    <View style={[styles.slide, { width: slideWidth }]}>
+      <View style={styles.slideCard}>
+        <View style={styles.emojiContainer}>
+          <Text style={styles.emoji}>{slide.emoji}</Text>
+        </View>
+        <Text style={styles.slideTitle}>{slide.title}</Text>
+        <Text style={styles.slideBody}>{slide.body}</Text>
       </View>
-      <Text style={styles.slideTitle}>{slide.title}</Text>
-      <Text style={styles.slideBody}>{slide.body}</Text>
     </View>
   );
 }
@@ -182,8 +192,13 @@ function SlideCard({ slide }: { slide: Slide }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.primaryLight,
     alignItems: 'center',
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    alignSelf: 'center',
   },
   skipButton: {
     alignSelf: 'flex-start',  // In RTL, this aligns to the right (start = right)
@@ -192,15 +207,16 @@ const styles = StyleSheet.create({
   },
   skipText: {
     ...Typography.bodySmall,
-    color: Colors.textSecondary,
+    color: Colors.primary,
+    fontWeight: '600',
   },
   logoContainer: {
     alignItems: 'center',
     marginVertical: Spacing.lg,
   },
   logoText: {
-    fontSize: 36,
-    fontWeight: '800',
+    fontSize: 48,
+    fontWeight: '900',
     color: Colors.primary,
     letterSpacing: 1,
   },
@@ -212,30 +228,41 @@ const styles = StyleSheet.create({
   },
   slide: {
     alignItems: 'center',
-    paddingHorizontal: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
     justifyContent: 'center',
+  },
+  slideCard: {
+    backgroundColor: Colors.background,
+    borderRadius: 24,
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+    width: '100%',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: { shadowColor: Colors.primary, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.12, shadowRadius: 24 },
+      android: { elevation: 6 },
+    }),
   },
   emojiContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   emoji: {
-    fontSize: 56,
+    fontSize: 64,
   },
   slideTitle: {
-    ...Typography.h2,
+    fontSize: 22,
+    fontWeight: '800',
+    color: Colors.textPrimary,
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
   slideBody: {
-    ...Typography.body,
-    textAlign: 'center',
+    fontSize: 14,
     color: Colors.textSecondary,
-    lineHeight: 26,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   dotsContainer: {
     flexDirection: 'row',
@@ -250,19 +277,25 @@ const styles = StyleSheet.create({
   ctaButton: {
     backgroundColor: Colors.primary,
     paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.xxl,
     borderRadius: BorderRadius.pill,
     marginBottom: Spacing.md,
-    minWidth: 200,
+    width: '100%',
+    maxWidth: 400,
     alignItems: 'center',
+    marginHorizontal: Spacing.lg,
+    ...Platform.select({
+      ios: { shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8 },
+      android: { elevation: 4 },
+    }),
   },
   ctaText: {
     ...Typography.button,
     color: Colors.textInverse,
+    fontWeight: '700',
   },
   termsText: {
-    ...Typography.caption,
-    color: Colors.textSecondary,
+    fontSize: 11,
+    color: Colors.textDisabled,
     textAlign: 'center',
     paddingHorizontal: Spacing.xl,
     marginBottom: Spacing.lg,

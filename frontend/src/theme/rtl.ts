@@ -19,45 +19,58 @@ export function initializeRTL(): void {
     I18nManager.allowRTL(true);
     I18nManager.forceRTL(true);
   }
+
+  // Web: set document direction and language for RTL
+  if (Platform.OS === 'web' && typeof document !== 'undefined') {
+    document.documentElement.dir = 'rtl';
+    document.documentElement.lang = 'he';
+  }
 }
 
 // ─── Color Palette ────────────────────────────────────────────────────────────
 
 export const Colors = {
   // Brand
-  primary: '#1A73E8',        // Jesta blue
-  primaryDark: '#1557B0',
-  primaryLight: '#E8F0FE',
-  secondary: '#34A853',      // Community green
-  accent: '#FBBC04',         // Karma yellow
+  primary: '#2563EB',        // Jesta blue
+  primaryDark: '#1D4ED8',
+  primaryLight: '#EFF6FF',
+  secondary: '#10B981',      // Community green
+  accent: '#F59E0B',         // Karma yellow
 
   // Neutrals
   background: '#FFFFFF',
-  surface: '#F8F9FA',
-  border: '#E0E0E0',
-  divider: '#F0F0F0',
+  surface: '#F8FAFC',
+  border: '#E2E8F0',
+  divider: '#E2E8F0',
 
   // Text
-  textPrimary: '#202124',
-  textSecondary: '#5F6368',
-  textDisabled: '#9AA0A6',
+  textPrimary: '#0F172A',
+  textSecondary: '#64748B',
+  textDisabled: '#94A3B8',
   textInverse: '#FFFFFF',
 
   // Semantic
-  success: '#34A853',
-  warning: '#FBBC04',
-  error: '#EA4335',
-  info: '#1A73E8',
+  success: '#10B981',
+  warning: '#F59E0B',
+  error: '#EF4444',
+  info: '#2563EB',
 
   // Trust score gradient
-  trustLow: '#EA4335',
-  trustMid: '#FBBC04',
-  trustHigh: '#34A853',
+  trustLow: '#EF4444',
+  trustMid: '#F59E0B',
+  trustHigh: '#10B981',
 
   // Community
-  communityBackground: '#E8F5E9',
-  communityBorder: '#4CAF50',
-  karmaGold: '#F9A825',
+  communityBackground: '#D1FAE5',
+  communityBorder: '#A7F3D0',
+  karmaGold: '#F59E0B',
+
+  // Aliases (used by FundEscrow, TransactionHistory, InvoiceViewer)
+  text: '#0F172A',           // alias for textPrimary
+  textMuted: '#64748B',      // alias for textSecondary
+  textLight: '#94A3B8',      // alias for textDisabled
+  primaryBorder: '#BFDBFE',
+  danger: '#EF4444',         // alias for error
 } as const;
 
 // ─── Typography ───────────────────────────────────────────────────────────────
@@ -83,13 +96,15 @@ export const Fonts = {
 
 export const Typography: Record<string, TextStyle> = {
   h1: { fontSize: 28, fontWeight: '700', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
-  h2: { fontSize: 22, fontWeight: '700', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
+  h2: { fontSize: 22, fontWeight: '800', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
   h3: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
   body: { fontSize: 16, fontWeight: '400', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
   bodySmall: { fontSize: 14, fontWeight: '400', color: Colors.textSecondary, textAlign: 'right', writingDirection: 'rtl' },
   caption: { fontSize: 12, fontWeight: '400', color: Colors.textSecondary, textAlign: 'right', writingDirection: 'rtl' },
   label: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
   button: { fontSize: 16, fontWeight: '600', textAlign: 'center', writingDirection: 'rtl' },
+  bodyBold: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
+  buttonLg: { fontSize: 18, fontWeight: '700', textAlign: 'center', writingDirection: 'rtl' },
 };
 
 // ─── Spacing & Layout ─────────────────────────────────────────────────────────
@@ -109,6 +124,7 @@ export const BorderRadius = {
   lg: 16,
   xl: 24,
   pill: 100,
+  full: 9999,
 } as const;
 
 /** RTL-aware row: reverses flex direction to flow right→left */
@@ -127,19 +143,26 @@ export function rtlPadding(start: number, end: number = start): ViewStyle {
 
 // ─── Shadows ──────────────────────────────────────────────────────────────────
 
+const _sm = Platform.select({
+  ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4 },
+  android: { elevation: 2 },
+});
+const _md = Platform.select({
+  ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 8 },
+  android: { elevation: 4 },
+});
+const _lg = Platform.select({
+  ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.16, shadowRadius: 16 },
+  android: { elevation: 8 },
+});
+
 export const Shadows = {
-  sm: Platform.select({
-    ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4 },
-    android: { elevation: 2 },
-  }),
-  md: Platform.select({
-    ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 8 },
-    android: { elevation: 4 },
-  }),
-  lg: Platform.select({
-    ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.16, shadowRadius: 16 },
-    android: { elevation: 8 },
-  }),
+  sm: _sm,
+  md: _md,
+  lg: _lg,
+  card: _sm,
+  button: _md,
+  modal: _lg,
 } as const;
 
 // ─── Hebrew Formatting Utilities ──────────────────────────────────────────────

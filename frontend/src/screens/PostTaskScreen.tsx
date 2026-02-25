@@ -160,11 +160,11 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={step > 1 ? () => setStep((s) => s - 1) : onBack}>
+        <TouchableOpacity style={styles.backButton} onPress={step > 1 ? () => setStep((s) => s - 1) : onBack}>
           <Text style={styles.backText}>{'→'}</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{he.tasks.post_task}</Text>
-        <View style={{ width: 32 }} />
+        <View style={{ width: 36 }} />
       </View>
 
       {/* Progress Bar */}
@@ -463,8 +463,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md,
   },
-  backText: { fontSize: 20, color: Colors.textSecondary },
-  headerTitle: { ...Typography.h3 },
+  backButton: {
+    width: 36, height: 36,
+    backgroundColor: Colors.surface,
+    borderWidth: 1, borderColor: Colors.border,
+    borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  backText: { fontSize: 16, color: Colors.textPrimary },
+  headerTitle: { fontSize: 18, fontWeight: '800', color: Colors.textPrimary },
   progressBar: {
     height: 4, backgroundColor: Colors.divider, marginHorizontal: Spacing.lg,
     borderRadius: 2, overflow: 'hidden',
@@ -473,12 +480,12 @@ const styles = StyleSheet.create({
   stepLabel: { ...Typography.caption, color: Colors.textSecondary, textAlign: 'center', marginVertical: Spacing.sm },
   scroll: { flex: 1 },
   scrollContent: { padding: Spacing.lg, paddingBottom: Spacing.xxl },
-  stepTitle: { ...Typography.h2, marginBottom: Spacing.lg },
-  fieldLabel: { ...Typography.label, marginBottom: Spacing.sm, marginTop: Spacing.md },
+  stepTitle: { fontSize: 20, fontWeight: '800', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl', marginBottom: Spacing.lg },
+  fieldLabel: { fontSize: 13, fontWeight: '600', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl', marginBottom: Spacing.sm, marginTop: Spacing.md },
   textInput: {
     backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.border,
     borderRadius: BorderRadius.md, paddingHorizontal: Spacing.md, paddingVertical: Spacing.md,
-    ...Typography.body, textAlign: 'right',
+    fontSize: 14, color: Colors.textPrimary, textAlign: 'right',
   },
   textInputError: { borderColor: Colors.error },
   textArea: { minHeight: 120, textAlignVertical: 'top' },
@@ -487,13 +494,13 @@ const styles = StyleSheet.create({
   categoryGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: Spacing.sm, marginBottom: Spacing.sm },
   categoryChip: {
     flexDirection: 'row-reverse', alignItems: 'center', gap: Spacing.xs,
-    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+    paddingHorizontal: 14, paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.pill, borderWidth: 1.5, borderColor: Colors.border,
     backgroundColor: Colors.surface,
   },
   categoryChipSelected: { borderColor: Colors.primary, backgroundColor: Colors.primaryLight },
   categoryEmoji: { fontSize: 16 },
-  categoryText: { ...Typography.bodySmall, color: Colors.textSecondary },
+  categoryText: { fontSize: 13, color: Colors.textSecondary },
   categoryTextSelected: { color: Colors.primary, fontWeight: '600' },
   mapPlaceholder: {
     height: 140, backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
@@ -513,7 +520,8 @@ const styles = StyleSheet.create({
   toggleRow: {
     flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: Colors.surface, borderRadius: BorderRadius.md,
-    padding: Spacing.md, marginVertical: Spacing.sm, ...Shadows.sm,
+    padding: 14, marginVertical: Spacing.sm,
+    borderWidth: 1, borderColor: Colors.border,
   },
   toggleSubtext: { ...Typography.caption, color: Colors.textSecondary },
   budgetRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: Spacing.sm },
@@ -528,8 +536,8 @@ const styles = StyleSheet.create({
   feeLabel: { ...Typography.bodySmall, color: Colors.textSecondary },
   feeValue: { ...Typography.bodySmall, fontWeight: '600' },
   karmaCard: {
-    backgroundColor: Colors.communityBackground, borderRadius: BorderRadius.md,
-    borderWidth: 1, borderColor: Colors.communityBorder, padding: Spacing.md, marginTop: Spacing.md,
+    backgroundColor: '#ECFDF5', borderRadius: BorderRadius.md,
+    borderWidth: 1.5, borderColor: '#A7F3D0', padding: Spacing.md, marginTop: Spacing.md,
   },
   karmaTitle: { ...Typography.label, color: Colors.secondary, marginBottom: Spacing.xs },
   karmaBody: { ...Typography.bodySmall, color: Colors.textSecondary },
