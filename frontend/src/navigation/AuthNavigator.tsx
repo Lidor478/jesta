@@ -14,6 +14,7 @@ import { ConfirmationResult } from 'firebase/auth';
 import SplashScreen from '../screens/SplashScreen';
 import PhoneInputScreen from '../screens/PhoneInputScreen';
 import OtpVerifyScreen from '../screens/OtpVerifyScreen';
+import ProfileSetupScreen from '../screens/ProfileSetupScreen';
 
 // ─── Route Params ────────────────────────────────────────────────────────────
 
@@ -21,6 +22,7 @@ export type AuthStackParamList = {
   Splash: undefined;
   PhoneInput: undefined;
   OtpVerify: { phone: string; sessionToken: string };
+  ProfileSetup: undefined;
 };
 
 const Stack = createStackNavigator<AuthStackParamList>();
@@ -64,12 +66,24 @@ export default function AuthNavigator() {
             phone={route.params.phone}
             confirmation={confirmationRef.current!}
             sessionToken={route.params.sessionToken}
-            onSuccess={(_userId, _isNewUser) => {
-              // Firebase onAuthStateChanged will detect the sign-in
-              // and App.tsx will auto-switch to MainNavigator.
-              // No explicit navigation needed here.
+            onSuccess={(_userId, isNewUser) => {
+              if (isNewUser) {
+                navigation.navigate('ProfileSetup');
+              }
+              // For existing users, Firebase onAuthStateChanged will detect
+              // the sign-in and App.tsx will auto-switch to MainNavigator.
             }}
             onBack={() => navigation.goBack()}
+          />
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="ProfileSetup">
+        {() => (
+          <ProfileSetupScreen
+            onComplete={() => {
+              // Auth context is now hydrated — App.tsx auto-switches to MainNavigator
+            }}
           />
         )}
       </Stack.Screen>

@@ -24,6 +24,7 @@ import {
 import { ConfirmationResult } from 'firebase/auth';
 import { firebaseAuth } from '../services/firebase';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatIsraeliPhone, interpolate } from '../theme/rtl';
+import { useAuthContext } from '../hooks/useAuth';
 import he from '../i18n/he.json';
 import { AUTH } from '../../config/constants';
 
@@ -60,6 +61,7 @@ export default function OtpVerifyScreen({
   const inputRefs = useRef<(TextInput | null)[]>(Array(OTP_LENGTH).fill(null));
   const shakeAnim = useRef(new Animated.Value(0)).current;
   const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const { loadUserProfile } = useAuthContext();
 
   const formattedPhone = formatIsraeliPhone(phone);
 
@@ -176,6 +178,9 @@ export default function OtpVerifyScreen({
         triggerShake();
         return;
       }
+
+      // Hydrate user profile into auth context
+      await loadUserProfile();
 
       onSuccess(data.userId, data.isNewUser);
     } catch {

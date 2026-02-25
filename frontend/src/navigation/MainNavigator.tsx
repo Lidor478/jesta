@@ -6,7 +6,7 @@
  * @hebrew ניווט ראשי — טאבים תחתונים ומסכים נוספים
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { Colors, Typography, Spacing, BorderRadius } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
+import { useLocation } from '../hooks/useLocation';
+import { userApi } from '../services/api';
 import he from '../i18n/he.json';
 
 import TaskFeedScreen from '../screens/TaskFeedScreen';
@@ -92,6 +94,15 @@ const profileStyles = StyleSheet.create({
 // ─── Tab Navigator ───────────────────────────────────────────────────────────
 
 function MainTabs() {
+  const { coords, isFallback } = useLocation();
+
+  // Fire-and-forget: update backend with real GPS when available
+  useEffect(() => {
+    if (!isFallback) {
+      userApi.updateLocation({ latitude: coords.latitude, longitude: coords.longitude }).catch(() => {});
+    }
+  }, [coords, isFallback]);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -121,8 +132,8 @@ function MainTabs() {
       >
         {({ navigation }) => (
           <TaskFeedScreen
-            userLat={32.0853}
-            userLng={34.7818}
+            userLat={coords.latitude}
+            userLng={coords.longitude}
             onTaskPress={(taskId) => navigation.navigate('TaskDetail', { taskId })}
             onPostTask={() => navigation.navigate('PostTask')}
           />
@@ -174,6 +185,8 @@ function MainTabs() {
 // ─── Main Stack ──────────────────────────────────────────────────────────────
 
 export default function MainNavigator() {
+  const { user } = useAuthContext();
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -187,7 +200,7 @@ export default function MainNavigator() {
         {({ route, navigation }) => (
           <TaskDetailScreen
             taskId={route.params.taskId}
-            currentUserId=""
+            currentUserId={user?.id ?? ''}
             onBack={() => navigation.goBack()}
             onOfferAccepted={(transactionId) =>
               navigation.navigate('FundEscrow', {

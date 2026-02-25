@@ -14,20 +14,28 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.jesta.app"
+      "bundleIdentifier": "com.jesta.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "ג׳סטה משתמשת במיקום שלך כדי למצוא משימות קרובות אליך."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#1A73E8"
       },
-      "package": "com.jesta.app"
+      "package": "com.jesta.app",
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      "expo-location"
     ]
   }
 }

@@ -291,13 +291,13 @@ export const paymentApi = {
 };
 
 export const userApi = {
-  getMe: (token: string) =>
+  getMe: (token?: string) =>
     api.get<{ user: unknown }>('/users/me', token),
 
-  updateProfile: (body: { displayName?: string; avatarUrl?: string }, token: string) =>
+  updateProfile: (body: { displayName?: string; avatarUrl?: string; role?: string }, token?: string) =>
     api.patch<{ user: unknown; messageHe: string }>('/users/me', body, token),
 
-  updateLocation: (body: { latitude: number; longitude: number }, token: string) =>
+  updateLocation: (body: { latitude: number; longitude: number }, token?: string) =>
     api.patch<{ success: boolean }>('/users/me/location', body, token),
 };
 

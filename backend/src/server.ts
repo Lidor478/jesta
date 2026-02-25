@@ -7,6 +7,7 @@ import * as admin from 'firebase-admin';
 
 import { authRouter } from './api/auth.routes';
 import { taskRouter } from './api/task.routes';
+import { userRouter } from './api/user.routes';
 import paymentRouter from './api/payment.routes';
 import { RATE_LIMIT } from './config/constants';
 
@@ -50,6 +51,7 @@ app.get('/health', (_req: Request, res: Response) => {
 
 app.use('/v1/auth', authRouter);
 app.use('/v1/tasks', taskRouter);
+app.use('/v1/users', userRouter);
 app.use('/v1/payments', paymentRouter);
 
 // ── Static frontend (Expo Web build) ────────────────────────────────

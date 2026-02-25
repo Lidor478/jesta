@@ -19,6 +19,7 @@ import { useState, useEffect, useCallback, createContext, useContext, ReactNode 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { firebaseAuth } from '../services/firebase';
+import { userApi } from '../services/api';
 
 // ─────────────────────────────────────────────
 // Types
@@ -29,7 +30,7 @@ export interface AuthUser {
   phone: string;
   displayName: string | null;
   avatarUrl: string | null;
-  role: 'CLIENT' | 'JESTER' | 'ADMIN';
+  role: 'CLIENT' | 'JESTER' | 'BOTH' | 'ADMIN';
   trustScore: number;
   verificationLevel: 'PHONE' | 'ID' | 'PRO';
   isIdVerified: boolean;
@@ -124,6 +125,42 @@ export function useAuth() {
   }, []);
 
   // ─────────────────────────────
+  // Load profile from backend
+  // ─────────────────────────────
+
+  const loadUserProfile = useCallback(async () => {
+    try {
+      const { user: backendUser } = await userApi.getMe() as { user: any };
+
+      // Map backend verificationLevel → frontend
+      const verificationMap: Record<string, AuthUser['verificationLevel']> = {
+        PHONE_VERIFIED: 'PHONE',
+        ID_VERIFIED: 'ID',
+        PRO_JESTER: 'PRO',
+      };
+
+      const authUser: AuthUser = {
+        id: backendUser.id,
+        phone: backendUser.phone,
+        displayName: backendUser.displayName,
+        avatarUrl: backendUser.avatarUrl,
+        role: backendUser.role,
+        trustScore: backendUser.trustScore,
+        verificationLevel: verificationMap[backendUser.verificationLevel] ?? 'PHONE',
+        isIdVerified: backendUser.isIdVerified,
+        karmaPoints: backendUser._count?.karmaPoints ?? 0,
+        completedTasksCount: backendUser.completedTasksCount,
+      };
+
+      await setUser(authUser);
+      return authUser;
+    } catch (err) {
+      console.error('[useAuth] loadUserProfile error:', err);
+      return null;
+    }
+  }, [setUser]);
+
+  // ─────────────────────────────
   // Logout
   // ─────────────────────────────
 
@@ -147,6 +184,7 @@ export function useAuth() {
     setUser,
     logout,
     updateUser,
+    loadUserProfile,
   };
 }
 

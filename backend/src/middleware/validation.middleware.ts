@@ -151,6 +151,14 @@ export const Schemas = {
     limit: z.coerce.number().int().positive().max(50).default(20),
   }),
 
+  // ─── User Profile Update ───────────────────────────────────────────────────
+
+  updateProfile: z.object({
+    displayName: z.string().min(2).max(60).optional(),
+    avatarUrl: z.string().url().optional(),
+    role: z.enum(['CLIENT', 'JESTER', 'BOTH']).optional(),
+  }).refine(data => Object.keys(data).length > 0, { message: 'לפחות שדה אחד נדרש.' }),
+
   // ─── User Location Update ──────────────────────────────────────────────────
 
   updateLocation: z.object({
