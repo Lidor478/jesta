@@ -293,13 +293,21 @@ export default function OtpVerifyScreen({
           </View>
         )}
 
-        {/* Loading indicator */}
-        {isLoading && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator color={Colors.primary} size="large" />
-            <Text style={styles.loadingText}>{he.auth.verifying}</Text>
-          </View>
-        )}
+        {/* Verify button */}
+        <TouchableOpacity
+          style={styles.verifyButton}
+          onPress={() => {
+            const code = otp.join('');
+            if (code.length === OTP_LENGTH) verifyOtp(code);
+          }}
+          activeOpacity={0.8}
+        >
+          {isLoading ? (
+            <ActivityIndicator color={Colors.textInverse} />
+          ) : (
+            <Text style={styles.verifyButtonText}>{he.auth.verify}</Text>
+          )}
+        </TouchableOpacity>
 
         {/* Resend */}
         <View style={styles.resendContainer}>
@@ -318,8 +326,8 @@ export default function OtpVerifyScreen({
 
         {/* Change number */}
         <TouchableOpacity style={styles.changeNumberRow} onPress={onBack}>
-          <Text style={styles.changeNumberText}>{he.auth.change_number}</Text>
           <Text style={styles.changeNumberNote}>{he.auth.wrong_number}</Text>
+          <Text style={styles.changeNumberText}>{he.auth.change_number}</Text>
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -402,6 +410,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: Spacing.md,
   },
+  verifyButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 17,
+    borderRadius: BorderRadius.pill,
+    alignItems: 'center',
+    width: '100%',
+    marginTop: Spacing.md,
+    marginBottom: Spacing.md,
+    ...Platform.select({
+      ios: { shadowColor: Colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 16 },
+      android: { elevation: 4 },
+    }),
+  },
+  verifyButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.textInverse,
+    textAlign: 'center',
+  },
   errorContainer: {
     backgroundColor: '#FFF0EE',
     borderRadius: BorderRadius.sm,
@@ -413,15 +440,6 @@ const styles = StyleSheet.create({
     ...Typography.bodySmall,
     color: Colors.error,
     textAlign: 'center',
-  },
-  loadingContainer: {
-    alignItems: 'center',
-    gap: Spacing.sm,
-    marginVertical: Spacing.md,
-  },
-  loadingText: {
-    ...Typography.bodySmall,
-    color: Colors.textSecondary,
   },
   resendContainer: {
     marginTop: Spacing.lg,

@@ -21,6 +21,7 @@
     "phone_title": "מה מספר הטלפון שלך?",
     "phone_subtitle": "נשלח לך קוד אימות ב-SMS",
     "phone_placeholder": "05X-XXXXXXX",
+    "phone_label": "מספר טלפון",
     "phone_prefix": "+972",
     "send_code": "שלח קוד",
     "sending": "שולח...",

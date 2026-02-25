@@ -154,7 +154,7 @@ export default function PhoneInputScreen({ onOtpSent, onBack }: PhoneInputScreen
 
         {/* Phone Input Card */}
         <View style={styles.card}>
-          <Text style={styles.inputLabel}>{he.auth.phone_prefix}</Text>
+          <Text style={styles.inputLabel}>{he.auth.phone_label}</Text>
 
           <View style={[styles.inputRow, error ? styles.inputRowError : null]}>
             {/* Country prefix badge */}
@@ -195,9 +195,8 @@ export default function PhoneInputScreen({ onOtpSent, onBack }: PhoneInputScreen
 
         {/* Send OTP Button */}
         <TouchableOpacity
-          style={[styles.sendButton, !canSubmit && styles.sendButtonDisabled]}
+          style={styles.sendButton}
           onPress={handleSendOtp}
-          disabled={!canSubmit}
           activeOpacity={0.8}
         >
           {isLoading ? (
@@ -347,7 +346,7 @@ const styles = StyleSheet.create({
     }),
   },
   sendButtonDisabled: {
-    backgroundColor: Colors.textDisabled,
+    opacity: 0.6,
   },
   sendButtonText: {
     fontSize: 16,
