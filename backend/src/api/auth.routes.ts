@@ -4,10 +4,11 @@
  * Thin handlers — all logic delegated to auth.service.ts.
  *
  * Routes:
- *   POST /v1/auth/otp/request  — Send OTP SMS
- *   POST /v1/auth/otp/verify   — Verify OTP, receive JWT
- *   POST /v1/auth/refresh      — Refresh access token
- *   DELETE /v1/auth/logout     — Invalidate session (client-side + server log)
+ *   POST /v1/auth/otp/request     — Send OTP SMS
+ *   POST /v1/auth/otp/verify      — Verify OTP, receive JWT
+ *   POST /v1/auth/otp/dev-verify  — Dev-only: bypass SMS, return custom token
+ *   POST /v1/auth/refresh         — Refresh access token
+ *   DELETE /v1/auth/logout        — Invalidate session (client-side + server log)
  *
  * @hebrew נקודות הקצה לאימות משתמשים באפליקציית ג׳סטה
  */
@@ -17,6 +18,7 @@ import rateLimit from 'express-rate-limit';
 import {
   requestOtp,
   verifyOtp,
+  devVerifyOtp,
   refreshAccessToken,
   normalizeIsraeliPhone,
   AuthError,
@@ -112,6 +114,36 @@ authRouter.post('/otp/verify', async (req: Request, res: Response) => {
         ? 'ברוך הבא לג׳סטה! בוא נגדיר את הפרופיל שלך.'
         : 'ברוך שובך לג׳סטה!',
     });
+  } catch (err) {
+    return handleAuthError(err, res);
+  }
+});
+
+// ─── POST /v1/auth/otp/dev-verify (dev only) ────────────────────────────────
+
+/**
+ * @description Dev-only endpoint that bypasses real SMS OTP verification.
+ * Uses Firebase Admin SDK to create a custom token for local development.
+ * Returns 404 in non-development environments.
+ *
+ * @hebrew נקודת קצה לפיתוח — עוקפת אימות SMS אמיתי
+ *
+ * Body: { sessionToken: string }
+ * Returns: { accessToken, refreshToken, isNewUser, userId, customToken }
+ */
+authRouter.post('/otp/dev-verify', async (req: Request, res: Response) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return res.status(404).json({ messageHe: 'Not found' });
+  }
+
+  try {
+    const { sessionToken } = req.body;
+    if (!sessionToken) {
+      return res.status(400).json({ code: 'MISSING_FIELDS', messageHe: 'חסרים שדות חובה.' });
+    }
+
+    const result = await devVerifyOtp(sessionToken);
+    return res.status(200).json(result);
   } catch (err) {
     return handleAuthError(err, res);
   }

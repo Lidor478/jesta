@@ -21,8 +21,8 @@ import {
   Platform,
   Animated,
 } from 'react-native';
-import { ConfirmationResult } from 'firebase/auth';
-import { firebaseAuth } from '../services/firebase';
+import { ConfirmationResult, signInWithCustomToken } from 'firebase/auth';
+import { firebaseAuth, isDevAuth } from '../services/firebase';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatIsraeliPhone, interpolate } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
@@ -156,7 +156,32 @@ export default function OtpVerifyScreen({
     setError(null);
 
     try {
-      // Verify OTP with Firebase
+      if (isDevAuth) {
+        // Dev mode: call dev-verify endpoint, then sign in with custom token
+        const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/v1/auth/otp/dev-verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionToken }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          setError(data.messageHe ?? he.errors.generic);
+          setOtp(Array(OTP_LENGTH).fill(''));
+          inputRefs.current[0]?.focus();
+          triggerShake();
+          return;
+        }
+
+        // Sign in with custom token → creates real Firebase session
+        await signInWithCustomToken(firebaseAuth, data.customToken);
+
+        await loadUserProfile();
+        onSuccess(data.userId, data.isNewUser);
+        return;
+      }
+
+      // Production: verify with Firebase
       await confirmation.confirm(code);
 
       // Get Firebase ID token to send to our backend

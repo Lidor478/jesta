@@ -21,7 +21,7 @@ import {
   Alert,
 } from 'react-native';
 import { signInWithPhoneNumber, RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
-import { firebaseAuth } from '../services/firebase';
+import { firebaseAuth, isDevAuth } from '../services/firebase';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Colors,
@@ -101,18 +101,26 @@ export default function PhoneInputScreen({ onOtpSent, onBack }: PhoneInputScreen
         return;
       }
 
-      // Format phone to E.164 for Firebase (+972XXXXXXXXX)
+      // Dev mode: skip Firebase SMS, create mock confirmation
+      if (isDevAuth) {
+        const mockConfirmation = {
+          verificationId: 'dev-mock',
+          confirm: async () => ({ user: null } as any),
+        } as ConfirmationResult;
+        onOtpSent(phone, mockConfirmation, data.sessionToken);
+        return;
+      }
+
+      // Production: Firebase sends real SMS
       const digits = phone.replace(/\D/g, '');
       const fullPhone = digits.startsWith('972')
         ? `+${digits}`
         : `+972${digits.slice(1)}`;
 
-      // Set up invisible reCAPTCHA verifier for web phone auth
       const recaptchaVerifier = new RecaptchaVerifier(firebaseAuth, 'recaptcha-container', {
         size: 'invisible',
       });
 
-      // Firebase sends the SMS and returns a confirmation object
       const confirmation = await signInWithPhoneNumber(firebaseAuth, fullPhone, recaptchaVerifier);
 
       onOtpSent(phone, confirmation, data.sessionToken);

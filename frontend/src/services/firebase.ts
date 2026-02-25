@@ -32,4 +32,5 @@ try {
 }
 
 export { firebaseAuth };
+export const isDevAuth = process.env.EXPO_PUBLIC_DEV_AUTH === 'true';
 export default app;

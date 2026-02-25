@@ -232,6 +232,52 @@ export async function refreshAccessToken(refreshToken: string): Promise<string> 
   return issueAccessToken(user);
 }
 
+// ─── Dev Auth Bypass ─────────────────────────────────────────────────────────
+
+/**
+ * @description Dev-only OTP bypass using Firebase Admin SDK custom tokens.
+ * Skips real SMS verification — creates a Firebase user and custom token directly.
+ * Throws immediately if NODE_ENV !== 'development'.
+ *
+ * @hebrew עוקף אימות SMS לפיתוח מקומי — יוצר משתמש Firebase ישירות
+ */
+export async function devVerifyOtp(sessionToken: string): Promise<OtpVerifyResult & { customToken: string }> {
+  if (process.env.NODE_ENV !== 'development') {
+    throw new AuthError('NOT_ALLOWED', 'Dev bypass not available.');
+  }
+
+  // Validate session token (same as normal flow)
+  let sessionPayload: { phone: string; purpose: string };
+  try {
+    sessionPayload = jwt.verify(sessionToken, process.env.JWT_SECRET!) as any;
+  } catch {
+    throw new AuthError('SESSION_EXPIRED', 'הפגישה פגה. יש לבקש קוד חדש.');
+  }
+
+  if (sessionPayload.purpose !== 'otp_session') {
+    throw new AuthError('INVALID_SESSION', 'טוקן לא תקין.');
+  }
+
+  // Get or create Firebase Auth user with this phone number
+  let firebaseUser: admin.auth.UserRecord;
+  try {
+    firebaseUser = await admin.auth().getUserByPhoneNumber(sessionPayload.phone);
+  } catch {
+    firebaseUser = await admin.auth().createUser({ phoneNumber: sessionPayload.phone });
+  }
+
+  // Create custom token so client can sign in
+  const customToken = await admin.auth().createCustomToken(firebaseUser.uid);
+
+  // Find or create Jesta user (same as normal flow)
+  const { user, isNewUser } = await findOrCreateUser(sessionPayload.phone);
+
+  const accessToken = issueAccessToken(user);
+  const refreshToken = issueRefreshToken(user.id);
+
+  return { accessToken, refreshToken, isNewUser, userId: user.id, customToken };
+}
+
 // ─── Rate Limiting Helpers ─────────────────────────────────────────────────────
 
 /** In production: replace with Redis INCR + EXPIRE */
