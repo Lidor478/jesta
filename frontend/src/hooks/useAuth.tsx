@@ -17,7 +17,8 @@
 
 import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import auth from '@react-native-firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { firebaseAuth } from '../services/firebase';
 
 // ─────────────────────────────────────────────
 // Types
@@ -66,7 +67,7 @@ export function useAuth() {
   // ─────────────────────────────
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
           // User is signed in — load cached profile from AsyncStorage
@@ -127,7 +128,7 @@ export function useAuth() {
   // ─────────────────────────────
 
   const logout = useCallback(async () => {
-    await auth().signOut();
+    await signOut(firebaseAuth);
     await AsyncStorage.removeItem(KEYS.USER);
     setState({
       user: null,

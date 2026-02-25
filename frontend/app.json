@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "Jesta",
+    "slug": "jesta",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#1A73E8"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.jesta.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1A73E8"
+      },
+      "package": "com.jesta.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

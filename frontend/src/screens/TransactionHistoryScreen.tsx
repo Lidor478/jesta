@@ -27,7 +27,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS, formatDate } from '../theme/rtl';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../hooks/useAuth';
 import { api } from '../services/api';
 
 // ─────────────────────────────────────────────
@@ -91,7 +91,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
 
 export default function TransactionHistoryScreen() {
   const navigation = useNavigation<NavProp>();
-  const { token, user } = useAuth();
+  const { user } = useAuthContext();
 
   const [role, setRole] = useState<UserRole>('JESTER');
   const [statusFilter, setStatusFilter] = useState<TransactionStatus | 'ALL'>('ALL');
@@ -125,7 +125,11 @@ export default function TransactionHistoryScreen() {
           ...(cursor && { cursor }),
         });
 
-        const data = await api.get(`/payments/mine?${params}`, token!);
+        const data = await api.get<{
+          transactions?: TransactionItem[];
+          stats?: Stats;
+          nextCursor?: string | null;
+        }>(`/payments/mine?${params}`);
 
         const newTxns: TransactionItem[] = data.transactions ?? [];
         setStats(data.stats ?? { totalEarned: 0, totalSpent: 0, completedCount: 0 });
@@ -141,7 +145,7 @@ export default function TransactionHistoryScreen() {
         setRefreshing(false);
       }
     },
-    [role, statusFilter, token, loading],
+    [role, statusFilter, loading],
   );
 
   useEffect(() => {

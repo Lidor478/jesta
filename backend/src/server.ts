@@ -1,3 +1,4 @@
+import path from 'path';
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -50,6 +51,15 @@ app.get('/health', (_req: Request, res: Response) => {
 app.use('/v1/auth', authRouter);
 app.use('/v1/tasks', taskRouter);
 app.use('/v1/payments', paymentRouter);
+
+// ── Static frontend (Expo Web build) ────────────────────────────────
+const frontendDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
+app.use(express.static(frontendDist));
+
+// SPA fallback — all non-API routes serve index.html
+app.get('*', (_req: Request, res: Response) => {
+  res.sendFile(path.join(frontendDist, 'index.html'));
+});
 
 // ── Global error handler ────────────────────────────────────────────
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

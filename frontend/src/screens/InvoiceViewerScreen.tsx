@@ -30,7 +30,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS, formatDate } from '../theme/rtl';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../hooks/useAuth';
 import { api } from '../services/api';
 
 // ─────────────────────────────────────────────
@@ -82,7 +82,7 @@ interface TransactionDetails {
 export default function InvoiceViewerScreen() {
   const navigation = useNavigation<NavProp>();
   const route = useRoute<InvoiceRouteProp>();
-  const { token } = useAuth();
+  // Auth token auto-injected by api.ts
 
   const { transactionId } = route.params;
 
@@ -100,11 +100,11 @@ export default function InvoiceViewerScreen() {
       try {
         setLoading(true);
         const [invoiceData, txnData] = await Promise.all([
-          api.get(`/payments/${transactionId}/invoice`, token!),
-          api.get(`/payments/${transactionId}`, token!),
+          api.get<InvoiceData>(`/payments/${transactionId}/invoice`),
+          api.get<{ transaction: TransactionDetails }>(`/payments/${transactionId}`),
         ]);
-        setInvoice(invoiceData as InvoiceData);
-        setTransaction(txnData.transaction as TransactionDetails);
+        setInvoice(invoiceData);
+        setTransaction(txnData.transaction);
       } catch (err) {
         setError('לא ניתן לטעון את החשבונית. נסה שוב.');
       } finally {
@@ -113,7 +113,7 @@ export default function InvoiceViewerScreen() {
     };
 
     fetchData();
-  }, [transactionId, token]);
+  }, [transactionId]);
 
   // ─────────────────────────────
   // Actions
@@ -256,7 +256,7 @@ export default function InvoiceViewerScreen() {
 
           {/* Totals */}
           <View style={styles.totalsSection}>
-            <TotalRow label="לפני מע"מ" value={formatNIS(commissionPreVat)} />
+            <TotalRow label={'לפני מע"מ'} value={formatNIS(commissionPreVat)} />
             <TotalRow label='מע"מ (17%)' value={formatNIS(fees.vatAmount)} />
             <View style={styles.totalFinalRow}>
               <Text style={styles.totalFinalLabel}>סה"כ לתשלום (כולל מע"מ)</Text>

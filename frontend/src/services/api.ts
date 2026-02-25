@@ -23,7 +23,7 @@
  *   await api.put('/tasks/123/offers/456/accept', {}, token);
  */
 
-import auth from '@react-native-firebase/auth';
+import { firebaseAuth } from './firebase';
 
 const BASE_URL = (process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:4000') + '/v1';
 const TIMEOUT_MS = 15_000;
@@ -70,7 +70,7 @@ async function request<T = unknown>(path: string, options: RequestOptions = {}):
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   } else {
-    const firebaseToken = await auth().currentUser?.getIdToken();
+    const firebaseToken = await firebaseAuth.currentUser?.getIdToken();
     if (firebaseToken) {
       headers['Authorization'] = `Bearer ${firebaseToken}`;
     }

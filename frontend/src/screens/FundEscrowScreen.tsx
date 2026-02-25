@@ -33,7 +33,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS } from '../theme/rtl';
 import { LIMITS } from '../../config/constants';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../hooks/useAuth';
 import { api } from '../services/api';
 
 // ─────────────────────────────────────────────
@@ -68,7 +68,6 @@ interface FeeBreakdown {
 export default function FundEscrowScreen() {
   const navigation = useNavigation<NavProp>();
   const route = useRoute<FundEscrowRouteProp>();
-  const { token } = useAuth();
 
   const { taskId, agreedPrice, jesterName, taskTitle, requiresVehicle } = route.params;
 
@@ -155,7 +154,7 @@ export default function FundEscrowScreen() {
               // In production: get real Cardcom token from WebView iframe
               const pToken = paymentMethod === 'CARD' ? tokenizeCard() : 'BANK_TRANSFER_PENDING';
 
-              const result = await api.post(
+              const result = await api.post<{ messageHe?: string }>(
                 '/payments/fund',
                 {
                   taskId,
@@ -163,7 +162,6 @@ export default function FundEscrowScreen() {
                   paymentToken: pToken,
                   paymentMethod,
                 },
-                token!,
               );
 
               Alert.alert(
