@@ -1,0 +1,208 @@
+{
+  "app": {
+    "name": "ג׳סטה",
+    "tagline": "שירותים בין אנשים — מהירים, קרובים, אמינים"
+  },
+
+  "onboarding": {
+    "welcome_title": "ברוכים הבאים לג׳סטה",
+    "welcome_subtitle": "פלטפורמה ישראלית לשירותים בין אנשים",
+    "slide1_title": "צריכים עזרה?",
+    "slide1_body": "פרסמו משימה וקבלו הצעות מג׳סטרים קרובים אליכם תוך דקות",
+    "slide2_title": "רוצים להרוויח?",
+    "slide2_body": "הפכו לג׳סטר — עזרו לשכנים שלכם וקבלו תשלום ישירות",
+    "slide3_title": "ג׳סטה לקהילה",
+    "slide3_body": "התנדבו לעזור לקשישים ולנזקקים. צברו נקודות קארמה והנחות על העמלות",
+    "get_started": "בואו נתחיל",
+    "skip": "דלג"
+  },
+
+  "auth": {
+    "phone_title": "מה מספר הטלפון שלך?",
+    "phone_subtitle": "נשלח לך קוד אימות ב-SMS",
+    "phone_placeholder": "05X-XXXXXXX",
+    "phone_prefix": "+972",
+    "send_code": "שלח קוד",
+    "sending": "שולח...",
+    "otp_title": "הזן את הקוד",
+    "otp_subtitle": "שלחנו קוד ב-SMS למספר {{phone}}",
+    "otp_placeholder": "• • • • • •",
+    "verify": "אמת",
+    "verifying": "מאמת...",
+    "resend_code": "שלח קוד חדש",
+    "resend_in": "שלח שוב בעוד {{seconds}} שניות",
+    "wrong_number": "מספר לא נכון?",
+    "change_number": "שנה מספר",
+    "otp_hint": "הקוד בן 6 ספרות ותקף ל-10 דקות",
+    "agree_terms": "בהמשך אתם מסכימים ל",
+    "terms": "תנאי השימוש",
+    "and": "ו",
+    "privacy": "מדיניות הפרטיות"
+  },
+
+  "profile_setup": {
+    "title": "ספרו לנו קצת עליכם",
+    "subtitle": "אפשר לשנות את הפרטים בכל עת",
+    "name_label": "שם מלא",
+    "name_placeholder": "ישראל ישראלי",
+    "role_title": "איך תרצו להשתמש בג׳סטה?",
+    "role_client": "אני צריך/ה עזרה",
+    "role_jester": "אני רוצה להרוויח",
+    "role_both": "שניהם",
+    "role_client_desc": "פרסמו משימות וקבלו הצעות",
+    "role_jester_desc": "קבלו משימות ותשלום",
+    "role_both_desc": "גמישות מלאה",
+    "location_title": "מה האזור שלכם?",
+    "location_subtitle": "לא נשתמש במיקום ללא אישורכם",
+    "location_allow": "אפשר גישה למיקום",
+    "location_later": "אחר כך",
+    "complete": "סיים הגדרה",
+    "saving": "שומר..."
+  },
+
+  "home": {
+    "greeting_morning": "בוקר טוב, {{name}} ☀️",
+    "greeting_afternoon": "צהריים טובים, {{name}}",
+    "greeting_evening": "ערב טוב, {{name}} 🌙",
+    "whats_needed": "מה צריכים היום?",
+    "nearby_tasks": "משימות קרובות",
+    "community_section": "ג׳סטה לקהילה",
+    "see_all": "ראה הכל",
+    "no_tasks": "אין משימות פעילות באזורך",
+    "be_first": "היה ראשון לפרסם משימה!"
+  },
+
+  "tasks": {
+    "post_task": "פרסם משימה",
+    "browse_tasks": "עיין במשימות",
+    "task_title_label": "כותרת המשימה",
+    "task_title_placeholder": "לדוגמה: שטיפת רכב בת״א",
+    "task_desc_label": "תיאור",
+    "task_desc_placeholder": "תארו את המשימה בפירוט — מה, איפה, מתי",
+    "category_label": "קטגוריה",
+    "budget_label": "תקציב (₪)",
+    "budget_min": "מינימום",
+    "budget_max": "מקסימום",
+    "location_label": "מיקום",
+    "schedule_label": "מתי?",
+    "schedule_asap": "בהקדם האפשרי",
+    "schedule_specific": "תאריך ספציפי",
+    "post": "פרסם",
+    "posted_success": "המשימה פורסמה בהצלחה!",
+    "offers_received": "{{count}} הצעות",
+    "no_offers_yet": "עדיין אין הצעות",
+    "accept_offer": "קבל הצעה",
+    "task_status_open": "פתוחה",
+    "task_status_assigned": "הוקצתה",
+    "task_status_in_progress": "בביצוע",
+    "task_status_pending": "ממתינה לאישור",
+    "task_status_completed": "הושלמה",
+    "task_status_disputed": "במחלוקת",
+    "approve_completion": "אשר השלמה",
+    "open_dispute": "פתח מחלוקת",
+    "vehicle_required": "נדרש רכב",
+    "distance_km": "{{km}} ק״מ ממך"
+  },
+
+  "categories": {
+    "DRIVING": "נסיעה / רכב",
+    "CLEANING": "ניקיון",
+    "MOVING": "הובלה",
+    "ERRANDS": "שליחויות",
+    "TECH_HELP": "עזרה טכנית",
+    "ELDERLY_CARE": "טיפול בקשישים",
+    "OTHER": "אחר"
+  },
+
+  "escrow": {
+    "pay_title": "תשלום בטוח",
+    "pay_subtitle": "הכסף מוחזק בנאמנות עד השלמת המשימה",
+    "amount_label": "סה״כ לתשלום",
+    "commission_note": "כולל עמלת פלטפורמה {{percent}}%",
+    "insurance_note": "כולל ביטוח זמני לנסיעה",
+    "pay_now": "שלם עכשיו",
+    "escrow_held": "הכסף מוחזק בנאמנות",
+    "escrow_release_note": "ישוחרר לג׳סטר לאחר אישורך",
+    "auto_release_note": "שחרור אוטומטי בעוד {{days}} ימים",
+    "release_funds": "שחרר תשלום לג׳סטר",
+    "refund_processing": "ההחזר בטיפול...",
+    "payment_success": "התשלום בוצע בהצלחה! ✓"
+  },
+
+  "ratings": {
+    "rate_title": "איך היה?",
+    "rate_jester": "דרגו את הג׳סטר",
+    "rate_client": "דרגו את הלקוח",
+    "comment_placeholder": "שתפו את החוויה שלכם (אופציונלי)",
+    "submit_rating": "שלח דירוג",
+    "rating_submitted": "תודה על הדירוג!",
+    "trust_score": "ציון אמינות",
+    "reviews_count": "{{count}} ביקורות"
+  },
+
+  "karma": {
+    "balance": "יתרת קארמה",
+    "points": "{{count}} נקודות",
+    "earned": "צברת {{points}} נקודות!",
+    "discount_available": "זכאי להנחה של {{percent}}% על העמלה",
+    "how_it_works": "איך עובד הקארמה?",
+    "earn_explanation": "עזרו לקהילה וצברו נקודות קארמה שניתן לממש כהנחות בפלטפורמה"
+  },
+
+  "community": {
+    "section_title": "ג׳סטה לקהילה",
+    "section_subtitle": "התנדבות שעוזרת — ומתגמלת",
+    "free_badge": "חינם",
+    "karma_reward": "מרוויחים {{points}} נקודות קארמה",
+    "target_elderly": "קשישים",
+    "target_needy": "נזקקים",
+    "volunteer_now": "התנדב עכשיו",
+    "community_empty": "אין כרגע משימות קהילתיות באזורך"
+  },
+
+  "profile": {
+    "title": "הפרופיל שלי",
+    "edit_profile": "ערוך פרופיל",
+    "verification_status": "סטטוס אימות",
+    "unverified": "לא מאומת",
+    "phone_verified": "טלפון מאומת ✓",
+    "id_verified": "תעודת זהות מאומתת ✓",
+    "pro_jester": "ג׳סטר מקצועי ⭐",
+    "become_pro": "הפוך לג׳סטר מקצועי",
+    "pro_desc": "עבור תהליך אימות ושלם 350 ₪ חד-פעמי לקבל תגית Pro",
+    "completed_tasks": "משימות שהושלמו",
+    "member_since": "חבר מאז {{date}}",
+    "logout": "התנתק"
+  },
+
+  "errors": {
+    "generic": "אירעה שגיאה. אנא נסה שנית.",
+    "network": "בעיית חיבור. בדקו את האינטרנט.",
+    "invalid_phone": "מספר טלפון לא תקין. יש להזין מספר ישראלי.",
+    "invalid_otp": "הקוד שגוי. נסה שנית.",
+    "otp_expired": "הקוד פג תוקף. שלח קוד חדש.",
+    "rate_limited": "שלחת יותר מדי בקשות. נסה שוב בעוד שעה.",
+    "cash_law": "הסכום חורג ממגבלת חוק המזומן (6,000 ₪).",
+    "session_expired": "פג תוקף הפגישה. יש להתחבר מחדש.",
+    "not_found": "לא נמצא.",
+    "permission_denied": "אין לך הרשאה לבצע פעולה זו."
+  },
+
+  "common": {
+    "cancel": "ביטול",
+    "confirm": "אישור",
+    "save": "שמור",
+    "back": "חזרה",
+    "next": "הבא",
+    "loading": "טוען...",
+    "nis_symbol": "₪",
+    "km": "ק״מ",
+    "minutes": "דקות",
+    "hours": "שעות",
+    "days": "ימים",
+    "today": "היום",
+    "tomorrow": "מחר",
+    "and": "ו",
+    "or": "או"
+  }
+}
