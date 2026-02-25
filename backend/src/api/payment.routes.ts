@@ -371,10 +371,8 @@ router.get('/mine', requireAuth, async (req: Request, res: Response) => {
     // Summary stats
     const stats = await prisma.transaction.aggregate({
       where: { ...whereClause, status: 'RELEASED' },
-      _sum: {
-        ...(role === 'JESTER' ? { netToJester: true } : { grossAmount: true }),
-      },
-      _count: { id: true },
+      _sum: { netToJester: true, grossAmount: true },
+      _count: true,
     });
 
     return res.json({
@@ -384,9 +382,9 @@ router.get('/mine', requireAuth, async (req: Request, res: Response) => {
       })),
       nextCursor,
       stats: {
-        totalEarned: stats._sum.netToJester ?? 0,
-        totalSpent: stats._sum.grossAmount ?? 0,
-        completedCount: stats._count.id,
+        totalEarned: stats._sum?.netToJester ?? 0,
+        totalSpent: stats._sum?.grossAmount ?? 0,
+        completedCount: stats._count,
       },
     });
   } catch (err) {

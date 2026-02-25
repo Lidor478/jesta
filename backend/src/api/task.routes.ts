@@ -250,7 +250,7 @@ taskRouter.post('/:id/approve', requireAuth, async (req: Request, res: Response)
     const result = await TaskService.approveCompletion(req.params.id, req.user!.id);
 
     // Dynamically import EscrowService to avoid circular deps
-    const { releaseToJester } = await import('../../services/escrow.service');
+    const { releaseToJester } = await import('../services/escrow.service');
     await releaseToJester(result.transactionId, 'CLIENT_APPROVED');
 
     return res.status(200).json({

@@ -20,9 +20,9 @@ import {
   refreshAccessToken,
   normalizeIsraeliPhone,
   AuthError,
-} from '../../services/auth.service';
-import { requireAuth } from '../../middleware/auth.middleware';
-import { RATE_LIMIT } from '../../config/constants';
+} from '../services/auth.service';
+import { requireAuth } from '../middleware/auth.middleware';
+import { RATE_LIMIT } from '../config/constants';
 
 export const authRouter = Router();
 

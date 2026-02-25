@@ -80,9 +80,9 @@ export class EscrowError extends Error {
 export function computeFees(agreedPrice: number, requiresVehicle: boolean): FeeBreakdown {
   const r = (n: number) => Math.round(n * 100) / 100;
 
-  const clientCommission = r(agreedPrice * FEES.CLIENT_COMMISSION_RATE);
-  const jesterCommission = r(agreedPrice * FEES.JESTER_COMMISSION_RATE);
-  const insuranceMarkup = requiresVehicle ? r(agreedPrice * FEES.INSURANCE_MARKUP_RATE) : 0;
+  const clientCommission = r(agreedPrice * FEES.CLIENT_COMMISSION);
+  const jesterCommission = r(agreedPrice * FEES.JESTER_COMMISSION);
+  const insuranceMarkup = requiresVehicle ? r(agreedPrice * FEES.MICRO_INSURANCE_MARKUP) : 0;
   const grossAmount = r(agreedPrice + clientCommission + insuranceMarkup);
   const netToJester = r(agreedPrice - jesterCommission);
   const jestaRevenue = r(clientCommission + jesterCommission);
@@ -259,8 +259,8 @@ export async function releaseToJester(
       clientPhone: client.phone,
       jesterName: jester.displayName ?? 'ג׳סטר',
       taskDescription: task.title,
-      agreedPrice: transaction.agreedPrice,
-      jestaCommission: transaction.jestaRevenue,
+      agreedPrice: transaction.agreedPrice ?? 0,
+      jestaCommission: transaction.jestaRevenue ?? 0,
       vatAmount: transaction.vatAmount,
       grossAmount: transaction.grossAmount,
       issuedAt: new Date(),
@@ -272,6 +272,7 @@ export async function releaseToJester(
     await prisma.invoice.create({
       data: {
         transactionId,
+        recipientId: jester.id,
         externalId: invoice.externalId,
         provider: 'MORNING',
         invoiceNumber: invoice.number,

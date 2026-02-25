@@ -359,6 +359,8 @@ export async function acceptOffer(taskId: string, offerId: string, clientId: str
     prisma.transaction.create({
       data: {
         taskId,
+        clientId,
+        jesterId: offer.jesterId,
         status: 'PENDING',
         grossAmount,
         clientCommission,

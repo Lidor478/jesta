@@ -50,17 +50,16 @@ enum TaskCategory {
 
 enum TransactionStatus {
   PENDING
-  HELD_IN_ESCROW
-  RELEASED_TO_JESTER
-  REFUNDED_TO_CLIENT
+  HELD
+  RELEASED
+  REFUNDED
   DISPUTED
 }
 
 enum EscrowEventType {
-  CLIENT_FUNDED
-  COMMISSION_HELD
-  JESTER_RELEASED
-  CLIENT_REFUNDED
+  FUND
+  RELEASE
+  REFUND
   DISPUTE_OPENED
   DISPUTE_RESOLVED
 }
@@ -99,13 +98,16 @@ model User {
   deletedAt DateTime?
 
   // Relations
-  tasksAsClient   Task[]       @relation("ClientTasks")
-  tasksAsJester   Task[]       @relation("JesterTasks")
-  offers          TaskOffer[]
-  ratingsGiven    Rating[]     @relation("RaterUser")
-  ratingsReceived Rating[]     @relation("RatedUser")
-  karmaPoints     KarmaPoint[]
-  invoices        Invoice[]
+  tasksAsClient        Task[]         @relation("ClientTasks")
+  tasksAsJester        Task[]         @relation("JesterTasks")
+  transactionsAsClient Transaction[]  @relation("ClientTransactions")
+  transactionsAsJester Transaction[]  @relation("JesterTransactions")
+  escrowActions        EscrowLedger[]
+  offers               TaskOffer[]
+  ratingsGiven         Rating[]       @relation("RaterUser")
+  ratingsReceived      Rating[]       @relation("RatedUser")
+  karmaPoints          KarmaPoint[]
+  invoices             Invoice[]
 
   @@index([phone])
   @@index([lastLatitude, lastLongitude])
@@ -192,23 +194,38 @@ model Transaction {
   id     String            @id @default(cuid())
   status TransactionStatus @default(PENDING)
 
+  // Parties
+  clientId String
+  client   User   @relation("ClientTransactions", fields: [clientId], references: [id])
+  jesterId String?
+  jester   User?  @relation("JesterTransactions", fields: [jesterId], references: [id])
+
   // Amounts (NIS)
+  agreedPrice      Float?
   grossAmount      Float
   clientCommission Float
   jesterCommission Float
-  insuranceMarkup  Float @default(0.0)
+  insuranceMarkup  Float  @default(0.0)
   netToJester      Float
+  jestaRevenue     Float?
+  vatAmount        Float  @default(0.0)
 
   // Compliance
-  isCashLawCompliant Boolean @default(true)
-  paymentMethod      String
+  isCashLawCompliant Boolean  @default(true)
+  paymentMethod      String?
+  paymentToken       String?
   externalPaymentRef String?
-  flaggedForCashLaw  Boolean @default(false)
+  flaggedForCashLaw  Boolean  @default(false)
 
   // Timestamps
-  createdAt        DateTime  @default(now())
-  clientFundedAt   DateTime?
-  jesterReleasedAt DateTime?
+  createdAt       DateTime  @default(now())
+  heldAt          DateTime?
+  releasedAt      DateTime?
+  isAutoRelease   Boolean   @default(false)
+  refundedAt      DateTime?
+  refundReason    String?
+  disputeReason   String?
+  disputeOpenedAt DateTime?
 
   // Relations
   taskId        String         @unique
@@ -222,12 +239,14 @@ model Transaction {
 // Append-only ledger — NEVER UPDATE, ONLY INSERT
 model EscrowLedger {
   id           String          @id @default(cuid())
-  eventType    EscrowEventType
-  amountNis    Float
+  action       EscrowEventType
+  amount       Float
   balanceAfter Float
   note         String?
+  metadata     String?
   createdAt    DateTime        @default(now())
   actorId      String?
+  actor        User?           @relation(fields: [actorId], references: [id])
 
   transactionId String
   transaction   Transaction @relation(fields: [transactionId], references: [id])
@@ -294,16 +313,17 @@ model CommunityTask {
 // ─────────────────────────────────────────
 
 model Invoice {
-  id           String   @id @default(cuid())
-  provider     String
-  externalId   String
-  documentUrl  String?
-  amountNis    Float
-  vatAmountNis Float
-  issuedAt     DateTime @default(now())
+  id            String   @id @default(cuid())
+  provider      String
+  externalId    String
+  invoiceNumber String?
+  pdfUrl        String?
+  totalAmount   Float
+  vatAmount     Float
+  issuedAt      DateTime @default(now())
 
   transactionId String      @unique
   transaction   Transaction @relation(fields: [transactionId], references: [id])
-  recipientId   String
-  recipient     User        @relation(fields: [recipientId], references: [id])
+  recipientId   String?
+  recipient     User?       @relation(fields: [recipientId], references: [id])
 }
