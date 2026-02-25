@@ -17,6 +17,7 @@ import {
   SafeAreaView, StatusBar, ActivityIndicator, Alert, TextInput,
   Modal,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import {
   Colors, Typography, Spacing, BorderRadius, Shadows,
   formatNIS, formatDistance, formatDate, formatRelativeTime, trustScoreColor,
@@ -201,8 +202,18 @@ export default function TaskDetailScreen({
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+        <View style={styles.header}>
+          <View style={[skeletonStyles.box, { width: 80, height: 24, borderRadius: BorderRadius.pill }]} />
+          <TouchableOpacity style={styles.backButton} onPress={onBack}>
+            <Ionicons name="chevron-forward" size={24} color={Colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ padding: Spacing.lg, gap: Spacing.md }}>
+          <View style={[skeletonStyles.box, { width: 100, height: 14 }]} />
+          <View style={[skeletonStyles.box, { width: '80%', height: 22 }]} />
+          <View style={[skeletonStyles.box, { width: '60%', height: 14 }]} />
+          <View style={[skeletonStyles.box, { width: '100%', height: 80, marginTop: Spacing.md }]} />
+          <View style={[skeletonStyles.box, { width: '100%', height: 56, borderRadius: BorderRadius.lg }]} />
         </View>
       </SafeAreaView>
     );
@@ -212,8 +223,11 @@ export default function TaskDetailScreen({
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.loadingContainer}>
+          <Ionicons name="alert-circle-outline" size={56} color={Colors.textDisabled} />
           <Text style={styles.errorText}>{he.errors.not_found}</Text>
-          <TouchableOpacity onPress={onBack}><Text style={styles.backLink}>{he.common.back}</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.errorBackButton} onPress={onBack}>
+            <Text style={styles.backLink}>{he.common.back}</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -227,7 +241,7 @@ export default function TaskDetailScreen({
       <View style={styles.header}>
         <StatusChip status={task.status} />
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backText}>{'→'}</Text>
+          <Ionicons name="chevron-forward" size={24} color={Colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -530,7 +544,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, borderBottomColor: Colors.border,
   },
   backButton: { padding: Spacing.sm },
-  backText: { fontSize: 20, color: Colors.textSecondary },
   scroll: { flex: 1 },
   titleBlock: { padding: Spacing.lg, borderBottomWidth: 1, borderBottomColor: Colors.divider },
   categoryTag: { fontSize: 12, fontWeight: '700', color: Colors.primary, marginBottom: Spacing.sm },
@@ -603,7 +616,13 @@ const styles = StyleSheet.create({
   statusChipText: { fontSize: 12, fontWeight: '700' },
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md },
   errorText: { ...Typography.body, color: Colors.error },
-  backLink: { ...Typography.body, color: Colors.primary },
+  backLink: { ...Typography.body, color: Colors.textInverse },
+  errorBackButton: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: BorderRadius.pill,
+  },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalCard: {
     backgroundColor: Colors.background, borderTopLeftRadius: BorderRadius.xl,
@@ -612,4 +631,8 @@ const styles = StyleSheet.create({
   modalTitle: { ...Typography.h3 },
   modalSubtitle: { ...Typography.body, color: Colors.textSecondary },
   modalActions: { gap: Spacing.sm },
+});
+
+const skeletonStyles = StyleSheet.create({
+  box: { backgroundColor: Colors.border, opacity: 0.5, borderRadius: BorderRadius.md, height: 16 },
 });

@@ -16,6 +16,7 @@ import {
   StyleSheet, SafeAreaView, StatusBar, Alert,
   KeyboardAvoidingView, Platform, Switch, ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS } from '../theme/rtl';
 import he from '../i18n/he.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -104,8 +105,18 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
 
   const handleNext = () => {
     if (validateStep()) {
-      if (step < TOTAL_STEPS) setStep((s) => s + 1);
-      else handleSubmit();
+      if (step < TOTAL_STEPS) {
+        setStep((s) => s + 1);
+      } else {
+        Alert.alert(
+          he.tasks.confirm_post_title,
+          he.tasks.confirm_post_body,
+          [
+            { text: he.common.cancel, style: 'cancel' },
+            { text: he.common.confirm, onPress: handleSubmit },
+          ]
+        );
+      }
     }
   };
 
@@ -161,7 +172,7 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={step > 1 ? () => setStep((s) => s - 1) : onBack}>
-          <Text style={styles.backText}>{'→'}</Text>
+          <Ionicons name="chevron-forward" size={20} color={Colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{he.tasks.post_task}</Text>
         <View style={{ width: 36 }} />
@@ -470,7 +481,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center', justifyContent: 'center',
   },
-  backText: { fontSize: 16, color: Colors.textPrimary },
   headerTitle: { fontSize: 18, fontWeight: '800', color: Colors.textPrimary },
   progressBar: {
     height: 4, backgroundColor: Colors.divider, marginHorizontal: Spacing.lg,

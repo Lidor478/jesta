@@ -19,6 +19,7 @@ import {
   Platform,
 } from 'react-native';
 import * as Location from 'expo-location';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme/rtl';
 import { userApi } from '../services/api';
 import { useAuthContext } from '../hooks/useAuth';
@@ -107,7 +108,7 @@ export default function ProfileSetupScreen({ onComplete }: ProfileSetupScreenPro
         style={styles.backButton}
         onPress={() => setStep((step - 1) as Step)}
       >
-        <Text style={styles.backText}>{'→'}</Text>
+        <Ionicons name="chevron-forward" size={24} color={Colors.textSecondary} />
       </TouchableOpacity>
     );
   };
@@ -283,10 +284,6 @@ const styles = StyleSheet.create({
     height: 44,
     marginTop: Spacing.sm,
   },
-  backText: {
-    fontSize: 20,
-    color: Colors.textSecondary,
-  },
   stepContainer: {
     width: '100%',
     alignItems: 'center',
@@ -313,7 +310,7 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     height: 52,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: Colors.border,
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,

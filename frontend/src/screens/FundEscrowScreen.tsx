@@ -31,6 +31,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS } from '../theme/rtl';
 import { LIMITS } from '../../config/constants';
 import { useAuthContext } from '../hooks/useAuth';
@@ -223,7 +224,7 @@ export default function FundEscrowScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Text style={styles.backIcon}>→</Text>
+            <Ionicons name="chevron-forward" size={20} color={Colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>מימון נאמנות</Text>
           <View style={{ width: 36 }} />
@@ -472,7 +473,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  backIcon: { fontSize: 16, color: Colors.text },
   headerTitle: { ...Typography.h3, color: Colors.text },
 
   // Task card

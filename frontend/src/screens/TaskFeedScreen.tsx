@@ -71,6 +71,31 @@ const SORT_OPTIONS: { key: SortBy; label: string }[] = [
   { key: 'price',     label: 'מחיר' },
 ];
 
+// ─── Skeleton Loader ──────────────────────────────────────────────────────────
+
+function TaskCardSkeleton() {
+  return (
+    <View style={styles.taskCard}>
+      <View style={styles.cardTopRow}>
+        <View style={[skeletonStyles.box, { width: 56, height: 20, borderRadius: BorderRadius.sm }]} />
+        <View style={[skeletonStyles.box, { flex: 1, height: 20 }]} />
+      </View>
+      <View style={[styles.badgeRow, { marginBottom: Spacing.md }]}>
+        <View style={[skeletonStyles.box, { width: 80, height: 20, borderRadius: BorderRadius.pill }]} />
+        <View style={[skeletonStyles.box, { width: 60, height: 20, borderRadius: BorderRadius.pill }]} />
+      </View>
+      <View style={styles.clientRow}>
+        <View style={[skeletonStyles.box, { width: 64, height: 16 }]} />
+        <View style={[skeletonStyles.box, { width: 100, height: 16 }]} />
+      </View>
+      <View style={styles.cardBottomRow}>
+        <View style={[skeletonStyles.box, { width: 36, height: 22, borderRadius: BorderRadius.pill }]} />
+        <View style={[skeletonStyles.box, { width: 72, height: 24 }]} />
+      </View>
+    </View>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function TaskFeedScreen({
@@ -293,9 +318,7 @@ export default function TaskFeedScreen({
 
       {/* Load more indicator */}
       {isLoadingMore && (
-        <View style={styles.loadMore}>
-          <ActivityIndicator color={Colors.primary} />
-        </View>
+        <TaskCardSkeleton />
       )}
     </View>
   );
@@ -336,9 +359,10 @@ export default function TaskFeedScreen({
 
       {/* Task List */}
       {isLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
-          <Text style={styles.loadingText}>{he.common.loading}</Text>
+        <View style={styles.list}>
+          <TaskCardSkeleton />
+          <TaskCardSkeleton />
+          <TaskCardSkeleton />
         </View>
       ) : (
         <FlatList
@@ -465,4 +489,8 @@ const styles = StyleSheet.create({
     ...Shadows.button,
   },
   emptyCtaText: { ...Typography.button, color: Colors.textInverse },
+});
+
+const skeletonStyles = StyleSheet.create({
+  box: { backgroundColor: Colors.border, opacity: 0.5, borderRadius: BorderRadius.md, height: 16 },
 });

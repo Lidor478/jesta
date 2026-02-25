@@ -22,6 +22,7 @@ import {
 } from 'react-native';
 import { signInWithPhoneNumber, RecaptchaVerifier, ConfirmationResult } from 'firebase/auth';
 import { firebaseAuth } from '../services/firebase';
+import { Ionicons } from '@expo/vector-icons';
 import {
   Colors,
   Typography,
@@ -141,7 +142,7 @@ export default function PhoneInputScreen({ onOtpSent, onBack }: PhoneInputScreen
         {/* Back button */}
         {onBack && (
           <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Text style={styles.backText}>{'→'}</Text>
+            <Ionicons name="chevron-forward" size={24} color={Colors.textSecondary} />
           </TouchableOpacity>
         )}
 
@@ -235,10 +236,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',  // RTL: flex-start = right side
     padding: Spacing.md,
     marginTop: Spacing.sm,
-  },
-  backText: {
-    fontSize: 20,
-    color: Colors.textSecondary,
   },
   header: {
     alignItems: 'center',

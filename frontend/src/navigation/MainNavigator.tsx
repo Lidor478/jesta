@@ -17,6 +17,7 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
 import { useLocation } from '../hooks/useLocation';
@@ -48,8 +49,8 @@ export type MainStackParamList = {
 
 type TabParamList = {
   HomeFeed: undefined;
-  Community: undefined;
-  Messages: undefined;
+  PostTask: undefined;
+  Transactions: undefined;
   Profile: undefined;
 };
 
@@ -117,17 +118,15 @@ function MainTabs() {
           height: 68,
         },
         tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textDisabled,
         tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
       }}
     >
       <Tab.Screen
         name="HomeFeed"
         options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.primary, opacity: focused ? 1 : 0.4 }}>משימות</Text>
-          ),
-          tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, textAlign: 'center', opacity: focused ? 1 : 0.4 }}>{'🗂️'}</Text>,
+          tabBarLabel: he.tabs.tasks,
+          tabBarIcon: ({ color, size }) => <Ionicons name="clipboard-outline" size={size} color={color} />,
         }}
       >
         {({ navigation }) => (
@@ -141,12 +140,10 @@ function MainTabs() {
       </Tab.Screen>
 
       <Tab.Screen
-        name="Community"
+        name="PostTask"
         options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.primary, opacity: focused ? 1 : 0.4 }}>קהילה</Text>
-          ),
-          tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, textAlign: 'center', opacity: focused ? 1 : 0.4 }}>{'❤️'}</Text>,
+          tabBarLabel: he.tabs.post_task,
+          tabBarIcon: ({ color, size }) => <Ionicons name="add-circle-outline" size={size} color={color} />,
         }}
       >
         {({ navigation }) => (
@@ -158,13 +155,11 @@ function MainTabs() {
       </Tab.Screen>
 
       <Tab.Screen
-        name="Messages"
+        name="Transactions"
         component={TransactionHistoryScreen}
         options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.primary, opacity: focused ? 1 : 0.4 }}>הודעות</Text>
-          ),
-          tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, textAlign: 'center', opacity: focused ? 1 : 0.4 }}>{'💬'}</Text>,
+          tabBarLabel: he.tabs.transactions,
+          tabBarIcon: ({ color, size }) => <Ionicons name="receipt-outline" size={size} color={color} />,
         }}
       />
 
@@ -172,10 +167,8 @@ function MainTabs() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarLabel: ({ focused }) => (
-            <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.primary, opacity: focused ? 1 : 0.4 }}>{he.profile.title}</Text>
-          ),
-          tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, textAlign: 'center', opacity: focused ? 1 : 0.4 }}>{'👤'}</Text>,
+          tabBarLabel: he.tabs.profile,
+          tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
       />
     </Tab.Navigator>

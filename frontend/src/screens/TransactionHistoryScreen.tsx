@@ -26,9 +26,11 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS, formatDate } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
 import { api } from '../services/api';
+import he from '../i18n/he.json';
 
 // ─────────────────────────────────────────────
 // Types
@@ -249,15 +251,15 @@ export default function TransactionHistoryScreen() {
     if (loading) return null;
     return (
       <View style={styles.emptyState}>
-        <Text style={styles.emptyEmoji}>{role === 'JESTER' ? '💼' : '🛒'}</Text>
-        <Text style={styles.emptyTitle}>
-          {role === 'JESTER' ? 'עדיין לא ביצעת משימות' : 'עדיין לא הזמנת שירות'}
-        </Text>
-        <Text style={styles.emptyBody}>
-          {role === 'JESTER'
-            ? 'עיין בפיד המשימות ושלח הצעות כדי להתחיל להרוויח'
-            : 'פרסם משימה וג׳סטרים קרובים ישלחו לך הצעות'}
-        </Text>
+        <Ionicons name="receipt-outline" size={56} color={Colors.textDisabled} style={{ marginBottom: 16 }} />
+        <Text style={styles.emptyTitle}>{he.transactions.empty_title}</Text>
+        <Text style={styles.emptyBody}>{he.transactions.empty_body}</Text>
+        <TouchableOpacity
+          style={styles.emptyCta}
+          onPress={() => navigation.navigate('HomeFeed')}
+        >
+          <Text style={styles.emptyCtaText}>{he.transactions.empty_cta}</Text>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -271,7 +273,7 @@ export default function TransactionHistoryScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backIcon}>→</Text>
+          <Ionicons name="chevron-forward" size={20} color={Colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>היסטוריית עסקאות</Text>
         <View style={{ width: 36 }} />
@@ -425,7 +427,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  backIcon: { fontSize: 16, color: Colors.text },
   headerTitle: { ...Typography.h3, color: Colors.text },
 
   // Role toggle
@@ -534,9 +535,15 @@ const styles = StyleSheet.create({
 
   // Empty state
   emptyState: { alignItems: 'center', paddingTop: 60, paddingHorizontal: 40 },
-  emptyEmoji: { fontSize: 56, marginBottom: 16 },
   emptyTitle: { ...Typography.h3, color: Colors.text, textAlign: 'center', marginBottom: 8 },
-  emptyBody: { ...Typography.body, color: Colors.textMuted, textAlign: 'center', lineHeight: 22 },
+  emptyBody: { ...Typography.body, color: Colors.textMuted, textAlign: 'center', lineHeight: 22, marginBottom: 20 },
+  emptyCta: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: BorderRadius.pill,
+  },
+  emptyCtaText: { ...Typography.button, color: 'white' },
 });
 
 const timerStyles = StyleSheet.create({

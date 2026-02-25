@@ -23,6 +23,7 @@ import {
 } from 'react-native';
 import { ConfirmationResult } from 'firebase/auth';
 import { firebaseAuth } from '../services/firebase';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatIsraeliPhone, interpolate } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
 import he from '../i18n/he.json';
@@ -243,7 +244,7 @@ export default function OtpVerifyScreen({
       >
         {/* Back button */}
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Text style={styles.backText}>{'→'}</Text>
+          <Ionicons name="chevron-forward" size={24} color={Colors.textSecondary} />
         </TouchableOpacity>
 
         {/* Header */}
@@ -355,10 +356,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     padding: Spacing.md,
     marginTop: Spacing.sm,
-  },
-  backText: {
-    fontSize: 20,
-    color: Colors.textSecondary,
   },
   header: {
     alignItems: 'center',

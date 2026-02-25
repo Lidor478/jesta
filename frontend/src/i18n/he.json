@@ -73,6 +73,13 @@
     "be_first": "היה ראשון לפרסם משימה!"
   },
 
+  "tabs": {
+    "tasks": "משימות",
+    "post_task": "פרסום",
+    "transactions": "עסקאות",
+    "profile": "פרופיל"
+  },
+
   "tasks": {
     "post_task": "פרסם משימה",
     "browse_tasks": "עיין במשימות",
@@ -102,7 +109,9 @@
     "approve_completion": "אשר השלמה",
     "open_dispute": "פתח מחלוקת",
     "vehicle_required": "נדרש רכב",
-    "distance_km": "{{km}} ק״מ ממך"
+    "distance_km": "{{km}} ק״מ ממך",
+    "confirm_post_title": "פרסום משימה",
+    "confirm_post_body": "האם לפרסם את המשימה? ג׳סטרים קרובים יוכלו לשלוח הצעות."
   },
 
   "categories": {
@@ -128,6 +137,12 @@
     "release_funds": "שחרר תשלום לג׳סטר",
     "refund_processing": "ההחזר בטיפול...",
     "payment_success": "התשלום בוצע בהצלחה! ✓"
+  },
+
+  "transactions": {
+    "empty_title": "עדיין אין עסקאות",
+    "empty_body": "כשתפרסם או תבצע משימה, העסקאות יופיעו כאן",
+    "empty_cta": "עיין במשימות"
   },
 
   "ratings": {

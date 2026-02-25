@@ -29,6 +29,7 @@ import {
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS, formatDate } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
 import { api } from '../services/api';
@@ -175,11 +176,11 @@ export default function InvoiceViewerScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backIcon}>→</Text>
+          <Ionicons name="chevron-forward" size={20} color={Colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>חשבונית</Text>
         <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
-          <Text style={styles.shareIcon}>⬆️</Text>
+          <Ionicons name="share-outline" size={20} color={Colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -364,7 +365,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  backIcon: { fontSize: 16, color: Colors.text },
   headerTitle: { ...Typography.h3, color: Colors.text },
   shareButton: {
     width: 36,
@@ -374,7 +374,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  shareIcon: { fontSize: 16 },
 
   scroll: { flex: 1 },
 
