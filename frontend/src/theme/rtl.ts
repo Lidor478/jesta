@@ -187,6 +187,19 @@ export function formatDate(date: Date): string {
 }
 
 /**
+ * @description Formats time in HH:MM Israeli format.
+ * @hebrew מעצב שעה בפורמט ישראלי
+ * @example formatTime(new Date()) → "14:30"
+ */
+export function formatTime(date: Date): string {
+  return new Intl.DateTimeFormat('he-IL', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(date);
+}
+
+/**
  * @description Formats a relative time string in Hebrew.
  * @hebrew מחזיר זמן יחסי בעברית
  */

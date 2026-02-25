@@ -24,6 +24,7 @@ import {
 } from '../theme/rtl';
 import he from '../i18n/he.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { taskApi } from '../services/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -66,12 +67,13 @@ interface TaskDetailScreenProps {
   currentUserId: string;
   onBack: () => void;
   onOfferAccepted: (transactionId: string) => void;
+  onEdit?: (task: Task) => void;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function TaskDetailScreen({
-  taskId, currentUserId, onBack, onOfferAccepted,
+  taskId, currentUserId, onBack, onOfferAccepted, onEdit,
 }: TaskDetailScreenProps) {
   const [task, setTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -197,6 +199,27 @@ export default function TaskDetailScreen({
     } finally { setActionLoading(false); }
   };
 
+  const handleCancel = () => {
+    Alert.alert(
+      he.tasks.cancel_task_title,
+      he.tasks.cancel_task_body,
+      [
+        { text: he.common.cancel, style: 'cancel' },
+        {
+          text: he.tasks.cancel_task_confirm, style: 'destructive', onPress: async () => {
+            setActionLoading(true);
+            try {
+              await taskApi.cancel(taskId);
+              onBack();
+            } catch {
+              Alert.alert('שגיאה', he.errors.generic);
+            } finally { setActionLoading(false); }
+          },
+        },
+      ]
+    );
+  };
+
   // ─── Render ──────────────────────────────────────────────────────────────────
 
   if (isLoading) {
@@ -239,7 +262,14 @@ export default function TaskDetailScreen({
 
       {/* Header */}
       <View style={styles.header}>
-        <StatusChip status={task.status} />
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: Spacing.sm }}>
+          <StatusChip status={task.status} />
+          {isOwner && task.status === 'OPEN' && onEdit && (
+            <TouchableOpacity onPress={() => onEdit(task)} style={styles.editIconButton}>
+              <Ionicons name="create-outline" size={20} color={Colors.primary} />
+            </TouchableOpacity>
+          )}
+        </View>
         <TouchableOpacity style={styles.backButton} onPress={onBack}>
           <Ionicons name="chevron-forward" size={24} color={Colors.textSecondary} />
         </TouchableOpacity>
@@ -396,6 +426,19 @@ export default function TaskDetailScreen({
           </View>
         )}
 
+        {/* Cancel button for owner */}
+        {isOwner && ['OPEN', 'DRAFT'].includes(task.status) && (
+          <View style={styles.actionSection}>
+            <TouchableOpacity
+              style={styles.cancelTaskButton}
+              onPress={handleCancel}
+              disabled={actionLoading}
+            >
+              <Text style={styles.cancelTaskButtonText}>{he.tasks.cancel_task}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
 
@@ -448,6 +491,7 @@ function StatusChip({ status }: { status: string }) {
     PENDING_APPROVAL: { label: he.tasks.task_status_pending,   color: Colors.warning },
     COMPLETED:        { label: he.tasks.task_status_completed, color: Colors.success },
     DISPUTED:         { label: he.tasks.task_status_disputed,  color: Colors.error },
+    CANCELLED:        { label: he.tasks.task_status_cancelled, color: Colors.textDisabled },
   };
   const s = statusMap[status] ?? { label: status, color: Colors.textSecondary };
   return (
@@ -631,6 +675,15 @@ const styles = StyleSheet.create({
   modalTitle: { ...Typography.h3 },
   modalSubtitle: { ...Typography.body, color: Colors.textSecondary },
   modalActions: { gap: Spacing.sm },
+  editIconButton: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center',
+  },
+  cancelTaskButton: {
+    paddingVertical: Spacing.md, borderRadius: BorderRadius.pill,
+    borderWidth: 1.5, borderColor: Colors.error, alignItems: 'center',
+  },
+  cancelTaskButtonText: { ...Typography.button, color: Colors.error },
 });
 
 const skeletonStyles = StyleSheet.create({

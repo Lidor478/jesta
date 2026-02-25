@@ -17,9 +17,12 @@ import {
   KeyboardAvoidingView, Platform, Switch, ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS } from '../theme/rtl';
+import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS, formatTime } from '../theme/rtl';
 import he from '../i18n/he.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { taskApi } from '../services/api';
+import DateTimePicker from '../components/DateTimePicker';
+import AddressAutocomplete from '../components/AddressAutocomplete';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,9 +43,26 @@ interface TaskDraft {
   requiresVehicle: boolean;
 }
 
+interface EditTaskData {
+  id: string;
+  title: string;
+  description: string;
+  category: Category;
+  budgetMin: number | null;
+  budgetMax: number;
+  address: string;
+  latitude: number;
+  longitude: number;
+  scheduledAt: string | null;
+  estimatedHours: number | null;
+  isCommunityTask: boolean;
+  requiresVehicle: boolean;
+}
+
 interface PostTaskScreenProps {
   onSuccess: (taskId: string) => void;
   onBack: () => void;
+  editTask?: EditTaskData;
 }
 
 const TOTAL_STEPS = 4;
@@ -59,17 +79,37 @@ const CATEGORIES: { key: Category; emoji: string }[] = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProps) {
+export default function PostTaskScreen({ onSuccess, onBack, editTask }: PostTaskScreenProps) {
+  const isEditMode = !!editTask;
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [draft, setDraft] = useState<TaskDraft>({
-    title: '', description: '', category: null,
-    budgetMin: '', budgetMax: '', address: '',
-    latitude: null, longitude: null,
-    scheduledAt: null, estimatedHours: '',
-    isCommunityTask: false, requiresVehicle: false,
+  const [draft, setDraft] = useState<TaskDraft>(() => {
+    if (editTask) {
+      return {
+        title: editTask.title,
+        description: editTask.description,
+        category: editTask.category,
+        budgetMin: editTask.budgetMin ? String(editTask.budgetMin) : '',
+        budgetMax: String(editTask.budgetMax),
+        address: editTask.address,
+        latitude: editTask.latitude,
+        longitude: editTask.longitude,
+        scheduledAt: editTask.scheduledAt,
+        estimatedHours: editTask.estimatedHours ? String(editTask.estimatedHours) : '',
+        isCommunityTask: editTask.isCommunityTask,
+        requiresVehicle: editTask.requiresVehicle,
+      };
+    }
+    return {
+      title: '', description: '', category: null,
+      budgetMin: '', budgetMax: '', address: '',
+      latitude: null, longitude: null,
+      scheduledAt: null, estimatedHours: '',
+      isCommunityTask: false, requiresVehicle: false,
+    };
   });
   const [errors, setErrors] = useState<Partial<Record<keyof TaskDraft, string>>>({});
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const update = useCallback(<K extends keyof TaskDraft>(key: K, value: TaskDraft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -91,6 +131,7 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
 
     if (step === 2) {
       if (!draft.address.trim()) newErrors.address = 'יש להזין כתובת';
+      if (!draft.latitude || !draft.longitude) newErrors.address = 'יש לבחור כתובת מהרשימה';
     }
 
     if (step === 3 && !draft.isCommunityTask) {
@@ -109,8 +150,8 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
         setStep((s) => s + 1);
       } else {
         Alert.alert(
-          he.tasks.confirm_post_title,
-          he.tasks.confirm_post_body,
+          isEditMode ? he.tasks.confirm_edit_title : he.tasks.confirm_post_title,
+          isEditMode ? he.tasks.confirm_edit_body : he.tasks.confirm_post_body,
           [
             { text: he.common.cancel, style: 'cancel' },
             { text: he.common.confirm, onPress: handleSubmit },
@@ -123,6 +164,10 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
   // ─── Submit ──────────────────────────────────────────────────────────────────
 
   const handleSubmit = async () => {
+    if (!draft.latitude || !draft.longitude) {
+      Alert.alert('שגיאה', 'יש לבחור כתובת עם מיקום');
+      return;
+    }
     setIsSubmitting(true);
     try {
       const token = await AsyncStorage.getItem('@jesta/access_token');
@@ -133,29 +178,35 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
         budgetMax: draft.isCommunityTask ? 0 : parseFloat(draft.budgetMax),
         budgetMin: draft.budgetMin ? parseFloat(draft.budgetMin) : undefined,
         address: draft.address.trim(),
-        latitude: draft.latitude ?? 32.0853,  // Default: Tel Aviv if not set
-        longitude: draft.longitude ?? 34.7818,
+        latitude: draft.latitude,
+        longitude: draft.longitude,
         scheduledAt: draft.scheduledAt ?? undefined,
         estimatedHours: draft.estimatedHours ? parseFloat(draft.estimatedHours) : undefined,
         isCommunityTask: draft.isCommunityTask,
         requiresVehicle: draft.requiresVehicle || draft.category === 'DRIVING',
       };
 
-      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/v1/tasks`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      if (isEditMode && token) {
+        const data = await taskApi.update(editTask!.id, payload, token);
+        Alert.alert('✓', he.tasks.task_updated);
+        onSuccess(editTask!.id);
+      } else {
+        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/v1/tasks`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        });
 
-      const data = await res.json();
-      if (!res.ok) {
-        Alert.alert('שגיאה', data.messageHe ?? he.errors.generic);
-        return;
+        const data = await res.json();
+        if (!res.ok) {
+          Alert.alert('שגיאה', data.messageHe ?? he.errors.generic);
+          return;
+        }
+        onSuccess(data.task.id);
       }
-      onSuccess(data.task.id);
     } catch {
       Alert.alert('שגיאה', he.errors.network);
     } finally {
@@ -174,7 +225,7 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
         <TouchableOpacity style={styles.backButton} onPress={step > 1 ? () => setStep((s) => s - 1) : onBack}>
           <Ionicons name="chevron-forward" size={20} color={Colors.textPrimary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{he.tasks.post_task}</Text>
+        <Text style={styles.headerTitle}>{isEditMode ? he.tasks.edit_task : he.tasks.post_task}</Text>
         <View style={{ width: 36 }} />
       </View>
 
@@ -194,7 +245,14 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
           keyboardShouldPersistTaps="handled"
         >
           {step === 1 && <StepWhat draft={draft} update={update} errors={errors} />}
-          {step === 2 && <StepWhereWhen draft={draft} update={update} errors={errors} />}
+          {step === 2 && (
+            <StepWhereWhen
+              draft={draft}
+              update={update}
+              errors={errors}
+              onOpenDatePicker={() => setShowDatePicker(true)}
+            />
+          )}
           {step === 3 && <StepBudget draft={draft} update={update} errors={errors} />}
           {step === 4 && <StepReview draft={draft} />}
         </ScrollView>
@@ -211,11 +269,20 @@ export default function PostTaskScreen({ onSuccess, onBack }: PostTaskScreenProp
             <ActivityIndicator color={Colors.textInverse} />
           ) : (
             <Text style={styles.nextButtonText}>
-              {step === TOTAL_STEPS ? he.tasks.post : he.common.next}
+              {step === TOTAL_STEPS ? (isEditMode ? he.common.save : he.tasks.post) : he.common.next}
             </Text>
           )}
         </TouchableOpacity>
       </View>
+
+      <DateTimePicker
+        visible={showDatePicker}
+        onConfirm={(date) => {
+          update('scheduledAt', date.toISOString());
+          setShowDatePicker(false);
+        }}
+        onCancel={() => setShowDatePicker(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -280,27 +347,22 @@ function StepWhat({ draft, update, errors }: any) {
 
 // ─── Step 2: Where & When ─────────────────────────────────────────────────────
 
-function StepWhereWhen({ draft, update, errors }: any) {
+function StepWhereWhen({ draft, update, errors, onOpenDatePicker }: any) {
   return (
     <View>
       <Text style={styles.stepTitle}>איפה ומתי?</Text>
 
       <Text style={styles.fieldLabel}>{he.tasks.location_label}</Text>
-      <TextInput
-        style={[styles.textInput, errors.address && styles.textInputError]}
+      <AddressAutocomplete
         value={draft.address}
-        onChangeText={(v) => update('address', v)}
-        placeholder="לדוגמה: רחוב הרצל 10, תל אביב"
-        placeholderTextColor={Colors.textDisabled}
-        textAlign="right"
+        onSelect={({ address, latitude, longitude }) => {
+          update('address', address);
+          update('latitude', latitude);
+          update('longitude', longitude);
+        }}
+        placeholder={he.tasks.address_placeholder}
+        error={errors.address}
       />
-      {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
-
-      {/* Map placeholder — in prod: integrate Google Maps Place Autocomplete */}
-      <View style={styles.mapPlaceholder}>
-        <Text style={styles.mapPlaceholderText}>🗺️  בחר מיקום על המפה</Text>
-        <Text style={styles.mapSubtext}>(אינטגרציה עם Google Maps — שלב הבא)</Text>
-      </View>
 
       <Text style={styles.fieldLabel}>{he.tasks.schedule_label}</Text>
       <View style={styles.scheduleRow}>
@@ -314,16 +376,24 @@ function StepWhereWhen({ draft, update, errors }: any) {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.scheduleChip, draft.scheduledAt && styles.scheduleChipSelected]}
-          onPress={() => {
-            // In prod: show DateTimePicker
-            update('scheduledAt', new Date(Date.now() + 86_400_000).toISOString());
-          }}
+          onPress={onOpenDatePicker}
         >
           <Text style={[styles.scheduleChipText, draft.scheduledAt && styles.scheduleChipTextSelected]}>
             {he.tasks.schedule_specific}
           </Text>
         </TouchableOpacity>
       </View>
+
+      {draft.scheduledAt && (
+        <View style={styles.selectedDateRow}>
+          <Text style={styles.selectedDateText}>
+            {new Date(draft.scheduledAt).toLocaleDateString('he-IL')} | {formatTime(new Date(draft.scheduledAt))}
+          </Text>
+          <TouchableOpacity onPress={onOpenDatePicker}>
+            <Text style={styles.changeDateLink}>שנה</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <Text style={styles.fieldLabel}>שעות עבודה משוערות</Text>
       <TextInput
@@ -447,7 +517,7 @@ function StepReview({ draft }: { draft: TaskDraft }) {
           ['קטגוריה', `${category?.emoji ?? ''} ${draft.category ? (he.categories as any)[draft.category] : ''}`],
           ['כותרת', draft.title],
           ['מיקום', draft.address],
-          ['תאריך', draft.scheduledAt ? new Date(draft.scheduledAt).toLocaleDateString('he-IL') : 'בהקדם האפשרי'],
+          ['תאריך', draft.scheduledAt ? `${new Date(draft.scheduledAt).toLocaleDateString('he-IL')} | ${formatTime(new Date(draft.scheduledAt))}` : 'בהקדם האפשרי'],
           ['תקציב', price],
         ].map(([label, value]) => (
           <View key={label} style={styles.reviewRow}>
@@ -512,13 +582,6 @@ const styles = StyleSheet.create({
   categoryEmoji: { fontSize: 16 },
   categoryText: { fontSize: 13, color: Colors.textSecondary },
   categoryTextSelected: { color: Colors.primary, fontWeight: '600' },
-  mapPlaceholder: {
-    height: 140, backgroundColor: Colors.surface, borderRadius: BorderRadius.lg,
-    borderWidth: 1.5, borderColor: Colors.border, borderStyle: 'dashed',
-    alignItems: 'center', justifyContent: 'center', marginVertical: Spacing.sm,
-  },
-  mapPlaceholderText: { ...Typography.body, color: Colors.textSecondary },
-  mapSubtext: { ...Typography.caption, color: Colors.textDisabled, marginTop: 4 },
   scheduleRow: { flexDirection: 'row-reverse', gap: Spacing.sm },
   scheduleChip: {
     flex: 1, paddingVertical: Spacing.md, borderRadius: BorderRadius.md,
@@ -527,6 +590,14 @@ const styles = StyleSheet.create({
   scheduleChipSelected: { borderColor: Colors.primary, backgroundColor: Colors.primaryLight },
   scheduleChipText: { ...Typography.bodySmall, color: Colors.textSecondary },
   scheduleChipTextSelected: { color: Colors.primary, fontWeight: '600' },
+  selectedDateRow: {
+    flexDirection: 'row-reverse', justifyContent: 'space-between',
+    alignItems: 'center', marginTop: Spacing.sm,
+    backgroundColor: Colors.primaryLight, borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+  },
+  selectedDateText: { ...Typography.bodySmall, color: Colors.primary, fontWeight: '600' },
+  changeDateLink: { ...Typography.bodySmall, color: Colors.primary, textDecorationLine: 'underline' },
   toggleRow: {
     flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: Colors.surface, borderRadius: BorderRadius.md,

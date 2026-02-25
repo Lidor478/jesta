@@ -241,6 +241,12 @@ export const taskApi = {
 
   dispute: (taskId: string, reason: string, token: string) =>
     api.post<{ messageHe: string }>(`/tasks/${taskId}/dispute`, { reason }, token),
+
+  cancel: (taskId: string, token?: string) =>
+    api.delete<{ messageHe: string }>(`/tasks/${taskId}`, undefined, token),
+
+  update: (taskId: string, body: unknown, token?: string) =>
+    api.put<{ task: unknown; messageHe: string }>(`/tasks/${taskId}`, body, token),
 };
 
 export const paymentApi = {

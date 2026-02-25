@@ -111,7 +111,21 @@
     "vehicle_required": "נדרש רכב",
     "distance_km": "{{km}} ק״מ ממך",
     "confirm_post_title": "פרסום משימה",
-    "confirm_post_body": "האם לפרסם את המשימה? ג׳סטרים קרובים יוכלו לשלוח הצעות."
+    "confirm_post_body": "האם לפרסם את המשימה? ג׳סטרים קרובים יוכלו לשלוח הצעות.",
+    "cancel_task": "בטל משימה",
+    "cancel_task_title": "ביטול משימה",
+    "cancel_task_body": "האם אתה בטוח שברצונך לבטל את המשימה? פעולה זו אינה הפיכה.",
+    "cancel_task_confirm": "כן, בטל",
+    "task_status_cancelled": "בוטלה",
+    "edit_task": "ערוך משימה",
+    "confirm_edit_title": "שמירת שינויים",
+    "confirm_edit_body": "האם לשמור את השינויים במשימה?",
+    "task_updated": "המשימה עודכנה בהצלחה!",
+    "date_picker_title": "בחר תאריך ושעה",
+    "select_time": "בחר שעה",
+    "address_placeholder": "חפש כתובת...",
+    "address_searching": "מחפש...",
+    "address_no_results": "לא נמצאו תוצאות"
   },
 
   "categories": {

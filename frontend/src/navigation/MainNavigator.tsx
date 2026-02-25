@@ -36,6 +36,7 @@ import InvoiceViewerScreen from '../screens/InvoiceViewerScreen';
 export type MainStackParamList = {
   MainTabs: undefined;
   TaskDetail: { taskId: string };
+  EditTask: { task: any };
   FundEscrow: {
     taskId: string;
     offerId: string;
@@ -205,6 +206,20 @@ export default function MainNavigator() {
                 requiresVehicle: false,
               })
             }
+            onEdit={(task) => navigation.navigate('EditTask', { task })}
+          />
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="EditTask">
+        {({ route, navigation }) => (
+          <PostTaskScreen
+            editTask={route.params.task}
+            onSuccess={(taskId) => {
+              navigation.goBack();
+              navigation.navigate('TaskDetail', { taskId });
+            }}
+            onBack={() => navigation.goBack()}
           />
         )}
       </Stack.Screen>
