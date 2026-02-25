@@ -9,10 +9,10 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { requireAuth, optionalAuth, cashLawGuard } from '../../middleware/auth.middleware';
-import { validate, validateQuery, Schemas } from '../../middleware/validation.middleware';
-import * as TaskService from '../../services/task.service';
-import * as MatchingService from '../../services/matching.service';
+import { requireAuth, optionalAuth, cashLawGuard } from '../middleware/auth.middleware';
+import { validate, validateQuery, Schemas } from '../middleware/validation.middleware';
+import * as TaskService from '../services/task.service';
+import * as MatchingService from '../services/matching.service';
 
 export const taskRouter = Router();
 

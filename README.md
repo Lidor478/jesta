@@ -30,43 +30,56 @@ Jesta is a community-driven marketplace where people can post everyday tasks (mo
 
 ```
 jesta/
-├── CLAUDE.md                 # AI architect protocol & project bible
-├── README.md                 # You are here
+├── CLAUDE.md                           # AI architect protocol & project bible
+├── README.md                           # You are here
 │
-├── # Frontend (React Native / Expo)
-├── useAuth.ts                # Firebase auth state hook + context provider
-├── PhoneInputScreen.tsx      # Phone number input with Israeli validation
-├── OtpVerifyScreen.tsx       # 6-digit OTP verification
-├── SplashScreen.tsx          # Onboarding intro slides
-├── TaskFeedScreen.tsx        # Nearby task listing
-├── TaskDetailScreen.tsx      # Task detail view
-├── PostTaskScreen.tsx        # Task creation form
-├── FundEscrowScreen.tsx      # Payment / escrow funding
-├── TransactionHistoryScreen.tsx  # Payment history
-├── InvoiceViewerScreen.tsx   # Invoice display
-├── api.ts                    # API client with auto Firebase token injection
-├── rtl.ts                    # RTL theme, colors, typography
-├── he.json                   # Hebrew i18n strings
-├── frontend-package.json     # Frontend dependencies
+├── backend/
+│   ├── package.json                    # Backend dependencies
+│   └── src/
+│       ├── api/
+│       │   ├── auth.routes.ts          # Auth API endpoints
+│       │   ├── task.routes.ts          # Task API endpoints
+│       │   └── payment.routes.ts       # Payment API endpoints
+│       ├── services/
+│       │   ├── auth.service.ts         # OTP flow, Firebase verification
+│       │   ├── escrow.service.ts       # Escrow hold/release/dispute logic
+│       │   ├── matching.service.ts     # Jester-task matching algorithm
+│       │   ├── morning.client.ts       # Morning API invoice integration
+│       │   └── task.service.ts         # Task CRUD + geo-matching logic
+│       ├── middleware/
+│       │   ├── auth.middleware.ts       # Firebase ID token verification
+│       │   └── validation.middleware.ts # Request validation
+│       └── config/
+│           └── constants.ts            # Business rules (fees, limits, karma)
 │
-├── # Backend (Node.js / Express)
-├── auth.service.ts           # OTP flow, Firebase verification, JWT issuance
-├── auth.routes.ts            # Auth API endpoints
-├── auth.middleware.ts         # Firebase ID token verification middleware
-├── task.service.ts           # Task CRUD + geo-matching logic
-├── task.routes.ts            # Task API endpoints
-├── escrow.service.ts         # Escrow hold/release/dispute logic
-├── payment.routes.ts         # Payment API endpoints
-├── matching.service.ts       # Jester-task matching algorithm
-├── morning.client.ts         # Morning API invoice integration
-├── validation.middleware.ts  # Request validation
-├── constants.ts              # Business rules (fees, limits, karma)
-├── backend-package.json      # Backend dependencies
+├── frontend/
+│   ├── package.json                    # Frontend dependencies
+│   ├── config/
+│   │   └── constants.ts               # Shared business rule constants
+│   └── src/
+│       ├── screens/
+│       │   ├── PhoneInputScreen.tsx    # Phone number input
+│       │   ├── OtpVerifyScreen.tsx     # 6-digit OTP verification
+│       │   ├── SplashScreen.tsx        # Onboarding intro slides
+│       │   ├── TaskFeedScreen.tsx      # Nearby task listing
+│       │   ├── TaskDetailScreen.tsx    # Task detail view
+│       │   ├── PostTaskScreen.tsx      # Task creation form
+│       │   ├── FundEscrowScreen.tsx    # Payment / escrow funding
+│       │   ├── TransactionHistoryScreen.tsx
+│       │   └── InvoiceViewerScreen.tsx # Invoice display
+│       ├── hooks/
+│       │   └── useAuth.ts             # Firebase auth state hook
+│       ├── services/
+│       │   └── api.ts                 # API client with auto token injection
+│       ├── theme/
+│       │   └── rtl.ts                 # RTL theme, colors, typography
+│       └── i18n/
+│           └── he.json                # Hebrew UI strings
 │
-├── # Documentation
-├── SCHEMA.md                 # Full Prisma schema documentation
-├── API_SPEC.md               # API endpoint specification
-└── ESCROW_FLOW.md            # Escrow payment flow documentation
+└── docs/
+    ├── SCHEMA.md                       # Full Prisma schema documentation
+    ├── API_SPEC.md                     # API endpoint specification
+    └── ESCROW_FLOW.md                  # Escrow payment flow documentation
 ```
 
 ## Business Rules
