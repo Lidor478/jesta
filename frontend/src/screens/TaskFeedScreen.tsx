@@ -262,9 +262,14 @@ export default function TaskFeedScreen({
 
       {tasks.length === 0 && !isLoading && (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyEmoji}>🔍</Text>
-          <Text style={styles.emptyTitle}>{he.home.no_tasks}</Text>
-          <Text style={styles.emptySubtitle}>{he.home.be_first}</Text>
+          <View style={styles.emptyCard}>
+            <Text style={styles.emptyEmoji}>🔍</Text>
+            <Text style={styles.emptyTitle}>{he.home.no_tasks}</Text>
+            <Text style={styles.emptySubtitle}>{he.home.be_first}</Text>
+            <TouchableOpacity style={styles.emptyCta} onPress={onPostTask}>
+              <Text style={styles.emptyCtaText}>+ {he.tasks.post_task}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -377,31 +382,35 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md,
+    borderBottomWidth: 1, borderBottomColor: Colors.divider,
   },
-  headerTitle: { ...Typography.h3 },
+  headerTitle: { ...Typography.h2 },
   postButton: {
     backgroundColor: Colors.primary, paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm, borderRadius: BorderRadius.pill,
+    ...Shadows.button,
   },
   postButtonText: { ...Typography.bodySmall, color: Colors.textInverse, fontWeight: '600' },
-  categoryBar: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.sm, gap: Spacing.sm },
+  categoryBar: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.sm, paddingBottom: Spacing.sm, gap: Spacing.xs + 2 },
   catPill: {
-    flexDirection: 'row-reverse', alignItems: 'center', gap: 4,
-    paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm,
+    flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'center',
+    gap: 4, height: 36,
+    paddingHorizontal: Spacing.sm + 4, paddingVertical: 0,
     borderRadius: BorderRadius.pill, borderWidth: 1.5, borderColor: Colors.border,
     backgroundColor: Colors.background,
   },
-  catPillActive: { backgroundColor: Colors.primaryLight, borderColor: Colors.primary },
-  catPillEmoji: { fontSize: 14 },
-  catPillText: { ...Typography.caption, color: Colors.textSecondary },
+  catPillActive: { backgroundColor: Colors.primaryLight, borderColor: Colors.primary, borderWidth: 2 },
+  catPillEmoji: { fontSize: 16, lineHeight: 20 },
+  catPillText: { ...Typography.caption, color: Colors.textSecondary, lineHeight: 16 },
   catPillTextActive: { color: Colors.primary, fontWeight: '700' },
-  sortRow: { paddingHorizontal: Spacing.lg, gap: Spacing.sm, paddingBottom: Spacing.sm },
+  sortRow: { paddingHorizontal: Spacing.lg, gap: Spacing.sm, paddingTop: Spacing.xs, paddingBottom: Spacing.sm },
   sortChip: {
-    paddingHorizontal: Spacing.md, paddingVertical: 6,
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs + 2,
     borderRadius: BorderRadius.pill, backgroundColor: Colors.surface,
+    borderWidth: 1, borderColor: Colors.border,
   },
-  sortChipActive: { backgroundColor: Colors.primary },
-  sortChipText: { ...Typography.caption, color: Colors.textSecondary },
+  sortChipActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
+  sortChipText: { ...Typography.bodySmall, color: Colors.textSecondary },
   sortChipTextActive: { color: Colors.textInverse, fontWeight: '600' },
   list: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxl },
   taskCard: {
@@ -442,8 +451,19 @@ const styles = StyleSheet.create({
   loadMore: { padding: Spacing.xl, alignItems: 'center' },
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md },
   loadingText: { ...Typography.body, color: Colors.textSecondary },
-  emptyState: { alignItems: 'center', paddingVertical: Spacing.xxl },
-  emptyEmoji: { fontSize: 48, marginBottom: Spacing.md },
+  emptyState: { alignItems: 'center', paddingVertical: Spacing.xxl, paddingHorizontal: Spacing.md },
+  emptyCard: {
+    alignItems: 'center', backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg, padding: Spacing.xl, width: '100%',
+    borderWidth: 1, borderColor: Colors.divider,
+  },
+  emptyEmoji: { fontSize: 64, marginBottom: Spacing.md },
   emptyTitle: { ...Typography.h3, textAlign: 'center', marginBottom: Spacing.sm },
-  emptySubtitle: { ...Typography.body, color: Colors.textSecondary, textAlign: 'center' },
+  emptySubtitle: { ...Typography.body, color: Colors.textSecondary, textAlign: 'center', marginBottom: Spacing.lg },
+  emptyCta: {
+    backgroundColor: Colors.primary, paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.sm + 2, borderRadius: BorderRadius.pill,
+    ...Shadows.button,
+  },
+  emptyCtaText: { ...Typography.button, color: Colors.textInverse },
 });
