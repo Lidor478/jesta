@@ -75,36 +75,28 @@ export const Colors = {
 
 // ─── Typography ───────────────────────────────────────────────────────────────
 
-/** Hebrew font stack — uses system fonts with RTL-aware fallbacks */
+/** Hebrew font stack — Heebo loaded via expo-font, with system fallbacks */
 export const Fonts = {
-  regular: Platform.select({
-    ios: 'System',
-    android: 'Rubik-Regular',  // Rubik has excellent Hebrew support
-    default: 'System',
-  }),
-  medium: Platform.select({
-    ios: 'System',
-    android: 'Rubik-Medium',
-    default: 'System',
-  }),
-  bold: Platform.select({
-    ios: 'System',
-    android: 'Rubik-Bold',
-    default: 'System',
-  }),
+  light: 'Heebo_300Light',
+  regular: 'Heebo_400Regular',
+  medium: 'Heebo_500Medium',
+  semiBold: 'Heebo_600SemiBold',
+  bold: 'Heebo_700Bold',
+  extraBold: 'Heebo_800ExtraBold',
+  black: 'Heebo_900Black',
 } as const;
 
 export const Typography: Record<string, TextStyle> = {
-  h1: { fontSize: 28, fontWeight: '700', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
-  h2: { fontSize: 22, fontWeight: '800', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
-  h3: { fontSize: 18, fontWeight: '600', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
-  body: { fontSize: 16, fontWeight: '400', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
-  bodySmall: { fontSize: 14, fontWeight: '400', color: Colors.textSecondary, textAlign: 'right', writingDirection: 'rtl' },
-  caption: { fontSize: 12, fontWeight: '400', color: Colors.textSecondary, textAlign: 'right', writingDirection: 'rtl' },
-  label: { fontSize: 14, fontWeight: '600', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
-  button: { fontSize: 16, fontWeight: '600', textAlign: 'center', writingDirection: 'rtl' },
-  bodyBold: { fontSize: 16, fontWeight: '700', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
-  buttonLg: { fontSize: 18, fontWeight: '700', textAlign: 'center', writingDirection: 'rtl' },
+  h1: { fontSize: 28, fontFamily: Fonts.bold, fontWeight: '700', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
+  h2: { fontSize: 22, fontFamily: Fonts.extraBold, fontWeight: '800', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
+  h3: { fontSize: 18, fontFamily: Fonts.semiBold, fontWeight: '600', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
+  body: { fontSize: 16, fontFamily: Fonts.regular, fontWeight: '400', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
+  bodySmall: { fontSize: 14, fontFamily: Fonts.regular, fontWeight: '400', color: Colors.textSecondary, textAlign: 'right', writingDirection: 'rtl' },
+  caption: { fontSize: 12, fontFamily: Fonts.regular, fontWeight: '400', color: Colors.textSecondary, textAlign: 'right', writingDirection: 'rtl' },
+  label: { fontSize: 14, fontFamily: Fonts.semiBold, fontWeight: '600', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
+  button: { fontSize: 16, fontFamily: Fonts.semiBold, fontWeight: '600', textAlign: 'center', writingDirection: 'rtl' },
+  bodyBold: { fontSize: 16, fontFamily: Fonts.bold, fontWeight: '700', color: Colors.textPrimary, textAlign: 'right', writingDirection: 'rtl' },
+  buttonLg: { fontSize: 18, fontFamily: Fonts.bold, fontWeight: '700', textAlign: 'center', writingDirection: 'rtl' },
 };
 
 // ─── Spacing & Layout ─────────────────────────────────────────────────────────

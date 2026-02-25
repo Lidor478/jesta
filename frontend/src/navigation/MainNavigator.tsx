@@ -113,8 +113,10 @@ function MainTabs() {
       <Tab.Screen
         name="HomeFeed"
         options={{
-          tabBarLabel: 'משימות',
-          tabBarIcon: () => <Text style={{ fontSize: 20, textAlign: 'center' }}>{'🗂️'}</Text>,
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.primary, opacity: focused ? 1 : 0.4 }}>משימות</Text>
+          ),
+          tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, textAlign: 'center', opacity: focused ? 1 : 0.4 }}>{'🗂️'}</Text>,
         }}
       >
         {({ navigation }) => (
@@ -130,8 +132,10 @@ function MainTabs() {
       <Tab.Screen
         name="Community"
         options={{
-          tabBarLabel: 'קהילה',
-          tabBarIcon: () => <Text style={{ fontSize: 20, textAlign: 'center' }}>{'❤️'}</Text>,
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.primary, opacity: focused ? 1 : 0.4 }}>קהילה</Text>
+          ),
+          tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, textAlign: 'center', opacity: focused ? 1 : 0.4 }}>{'❤️'}</Text>,
         }}
       >
         {({ navigation }) => (
@@ -146,8 +150,10 @@ function MainTabs() {
         name="Messages"
         component={TransactionHistoryScreen}
         options={{
-          tabBarLabel: 'הודעות',
-          tabBarIcon: () => <Text style={{ fontSize: 20, textAlign: 'center' }}>{'💬'}</Text>,
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.primary, opacity: focused ? 1 : 0.4 }}>הודעות</Text>
+          ),
+          tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, textAlign: 'center', opacity: focused ? 1 : 0.4 }}>{'💬'}</Text>,
         }}
       />
 
@@ -155,8 +161,10 @@ function MainTabs() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarLabel: he.profile.title,
-          tabBarIcon: () => <Text style={{ fontSize: 20, textAlign: 'center' }}>{'👤'}</Text>,
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ fontSize: 10, fontWeight: '600', color: Colors.primary, opacity: focused ? 1 : 0.4 }}>{he.profile.title}</Text>
+          ),
+          tabBarIcon: ({ focused }) => <Text style={{ fontSize: 20, textAlign: 'center', opacity: focused ? 1 : 0.4 }}>{'👤'}</Text>,
         }}
       />
     </Tab.Navigator>
