@@ -7,18 +7,11 @@
  */
 
 import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Typography, Spacing, BorderRadius } from '../theme/rtl';
+import { Colors } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
 import { useLocation } from '../hooks/useLocation';
 import { userApi } from '../services/api';
@@ -28,6 +21,7 @@ import he from '../i18n/he.json';
 import TaskFeedScreen from '../screens/TaskFeedScreen';
 import PostTaskScreen from '../screens/PostTaskScreen';
 import TransactionHistoryScreen from '../screens/TransactionHistoryScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import TaskDetailScreen from '../screens/TaskDetailScreen';
 import FundEscrowScreen from '../screens/FundEscrowScreen';
 import InvoiceViewerScreen from '../screens/InvoiceViewerScreen';
@@ -58,41 +52,6 @@ type TabParamList = {
 
 const Stack = createStackNavigator<MainStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
-
-// ─── Profile Placeholder ─────────────────────────────────────────────────────
-
-function ProfileScreen() {
-  const { user, logout } = useAuthContext();
-
-  return (
-    <SafeAreaView style={profileStyles.container}>
-      <Text style={profileStyles.title}>{he.profile.title}</Text>
-      {user?.displayName && (
-        <Text style={profileStyles.name}>{user.displayName}</Text>
-      )}
-      {user?.phone && (
-        <Text style={profileStyles.phone}>{user.phone}</Text>
-      )}
-      <TouchableOpacity style={profileStyles.logoutButton} onPress={logout}>
-        <Text style={profileStyles.logoutText}>{he.profile.logout}</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
-}
-
-const profileStyles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center', padding: Spacing.xl },
-  title: { ...Typography.h2, marginBottom: Spacing.lg },
-  name: { ...Typography.h3, color: Colors.textPrimary, marginBottom: Spacing.sm },
-  phone: { ...Typography.body, color: Colors.textSecondary, marginBottom: Spacing.xl },
-  logoutButton: {
-    backgroundColor: Colors.error,
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.pill,
-  },
-  logoutText: { ...Typography.button, color: Colors.textInverse },
-});
 
 // ─── Tab Navigator ───────────────────────────────────────────────────────────
 

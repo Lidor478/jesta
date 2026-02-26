@@ -202,7 +202,20 @@
     "pro_desc": "עבור תהליך אימות ושלם 350 ₪ חד-פעמי לקבל תגית Pro",
     "completed_tasks": "משימות שהושלמו",
     "member_since": "חבר מאז {{date}}",
-    "logout": "התנתק"
+    "logout": "התנתק",
+    "role_label": "תפקיד",
+    "role_client_label": "לקוח",
+    "role_jester_label": "ג׳סטר",
+    "role_both_label": "לקוח וג׳סטר",
+    "trust_score": "ציון אמינות",
+    "karma_points": "נקודות קארמה",
+    "client_rating": "דירוג כלקוח",
+    "jester_rating": "דירוג כג׳סטר",
+    "transaction_history": "היסטוריית עסקאות",
+    "edit_name_label": "שם תצוגה",
+    "save_profile": "שמור",
+    "profile_updated": "הפרופיל עודכן בהצלחה!",
+    "no_rating_yet": "אין דירוג עדיין"
   },
 
   "errors": {
