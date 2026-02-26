@@ -36,6 +36,9 @@ import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS } from '.
 import { LIMITS } from '../../config/constants';
 import { useAuthContext } from '../hooks/useAuth';
 import { api } from '../services/api';
+import { useToast } from '../components/Toast';
+import AnimatedPressable from '../components/AnimatedPressable';
+import ScreenHeader from '../components/ScreenHeader';
 
 // ─────────────────────────────────────────────
 // Types
@@ -71,6 +74,7 @@ export default function FundEscrowScreen() {
   const route = useRoute<FundEscrowRouteProp>();
 
   const { taskId, agreedPrice, jesterName, taskTitle, requiresVehicle } = route.params;
+  const { toast } = useToast();
 
   // State
   const [fees, setFees] = useState<FeeBreakdown | null>(null);
@@ -137,7 +141,7 @@ export default function FundEscrowScreen() {
     if (!fees) return;
 
     if (paymentMethod === 'CARD' && (!cardNumber || !cardExpiry || !cardCvv)) {
-      Alert.alert('שגיאה', 'נא למלא את פרטי כרטיס האשראי');
+      toast('נא למלא את פרטי כרטיס האשראי', 'error');
       return;
     }
 
@@ -165,19 +169,11 @@ export default function FundEscrowScreen() {
                 },
               );
 
-              Alert.alert(
-                '✅ התשלום בוצע!',
-                result.messageHe ?? 'הכסף מוחזק בנאמנות. הג׳סטר יכול להתחיל לעבוד!',
-                [
-                  {
-                    text: 'המשך',
-                    onPress: () => navigation.replace('TaskDetail', { taskId }),
-                  },
-                ],
-              );
+              toast(result.messageHe ?? 'הכסף מוחזק בנאמנות. הג׳סטר יכול להתחיל לעבוד!', 'success');
+              navigation.replace('TaskDetail', { taskId });
             } catch (err: unknown) {
               const msg = err instanceof Error ? err.message : 'שגיאה בתשלום';
-              Alert.alert('שגיאה בתשלום', msg);
+              toast(msg, 'error');
             } finally {
               setLoading(false);
             }
@@ -222,12 +218,8 @@ export default function FundEscrowScreen() {
     >
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="chevron-forward" size={20} color={Colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>מימון נאמנות</Text>
-          <View style={{ width: 36 }} />
+        <View style={{ paddingTop: 40 }}>
+          <ScreenHeader title="מימון נאמנות" onBack={() => navigation.goBack()} />
         </View>
 
         {/* Task summary card */}
@@ -374,11 +366,10 @@ export default function FundEscrowScreen() {
 
       {/* Bottom CTA */}
       <View style={styles.footer}>
-        <TouchableOpacity
+        <AnimatedPressable
           style={[styles.payButton, loading && styles.payButtonDisabled]}
           onPress={handleFund}
           disabled={loading}
-          activeOpacity={0.85}
         >
           {loading ? (
             <ActivityIndicator color="white" />
@@ -389,7 +380,7 @@ export default function FundEscrowScreen() {
                 : 'שלחתי העברה — המשך'}
             </Text>
           )}
-        </TouchableOpacity>
+        </AnimatedPressable>
         <Text style={styles.secureNote}>כל העסקאות מאובטחות בהצפנה TLS 1.3</Text>
       </View>
     </KeyboardAvoidingView>

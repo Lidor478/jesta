@@ -23,6 +23,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius } from '../theme/rtl';
 import { userApi } from '../services/api';
 import { useAuthContext } from '../hooks/useAuth';
+import ThemedInput from '../components/ThemedInput';
 import he from '../i18n/he.json';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -121,13 +122,10 @@ export default function ProfileSetupScreen({ onComplete }: ProfileSetupScreenPro
       <Text style={styles.stepSubtitle}>{he.profile_setup.subtitle}</Text>
 
       <Text style={styles.label}>{he.profile_setup.name_label}</Text>
-      <TextInput
-        style={styles.input}
+      <ThemedInput
         value={displayName}
         onChangeText={setDisplayName}
         placeholder={he.profile_setup.name_placeholder}
-        placeholderTextColor={Colors.textDisabled}
-        textAlign="right"
         autoFocus
       />
 

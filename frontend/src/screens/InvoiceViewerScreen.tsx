@@ -33,6 +33,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS, formatDate } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
 import { api } from '../services/api';
+import { useToast } from '../components/Toast';
+import ScreenHeader from '../components/ScreenHeader';
 
 // ─────────────────────────────────────────────
 // Types
@@ -86,6 +88,7 @@ export default function InvoiceViewerScreen() {
   // Auth token auto-injected by api.ts
 
   const { transactionId } = route.params;
+  const { toast } = useToast();
 
   const [invoice, setInvoice] = useState<InvoiceData | null>(null);
   const [transaction, setTransaction] = useState<TransactionDetails | null>(null);
@@ -125,7 +128,7 @@ export default function InvoiceViewerScreen() {
     try {
       await Linking.openURL(invoice.pdfUrl);
     } catch {
-      Alert.alert('שגיאה', 'לא ניתן לפתוח את ה-PDF');
+      toast('לא ניתן לפתוח את ה-PDF', 'error');
     }
   };
 
@@ -174,14 +177,16 @@ export default function InvoiceViewerScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="chevron-forward" size={20} color={Colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>חשבונית</Text>
-        <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
-          <Ionicons name="share-outline" size={20} color={Colors.primary} />
-        </TouchableOpacity>
+      <View style={{ paddingTop: 40 }}>
+        <ScreenHeader
+          title="חשבונית"
+          onBack={() => navigation.goBack()}
+          rightAction={
+            <TouchableOpacity onPress={handleShare} style={styles.shareButton}>
+              <Ionicons name="share-outline" size={20} color={Colors.primary} />
+            </TouchableOpacity>
+          }
+        />
       </View>
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>

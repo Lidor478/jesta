@@ -24,6 +24,8 @@ import {
 } from '../theme/rtl';
 import he from '../i18n/he.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Skeleton from '../components/Skeleton';
+import Avatar from '../components/Avatar';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -77,20 +79,20 @@ function TaskCardSkeleton() {
   return (
     <View style={styles.taskCard}>
       <View style={styles.cardTopRow}>
-        <View style={[skeletonStyles.box, { width: 56, height: 20, borderRadius: BorderRadius.sm }]} />
-        <View style={[skeletonStyles.box, { flex: 1, height: 20 }]} />
+        <Skeleton width={56} height={20} borderRadius={BorderRadius.sm} />
+        <Skeleton width={180} height={20} />
       </View>
       <View style={[styles.badgeRow, { marginBottom: Spacing.md }]}>
-        <View style={[skeletonStyles.box, { width: 80, height: 20, borderRadius: BorderRadius.pill }]} />
-        <View style={[skeletonStyles.box, { width: 60, height: 20, borderRadius: BorderRadius.pill }]} />
+        <Skeleton width={80} height={20} borderRadius={BorderRadius.pill} />
+        <Skeleton width={60} height={20} borderRadius={BorderRadius.pill} />
       </View>
       <View style={styles.clientRow}>
-        <View style={[skeletonStyles.box, { width: 64, height: 16 }]} />
-        <View style={[skeletonStyles.box, { width: 100, height: 16 }]} />
+        <Skeleton width={64} height={16} />
+        <Skeleton width={100} height={16} />
       </View>
       <View style={styles.cardBottomRow}>
-        <View style={[skeletonStyles.box, { width: 36, height: 22, borderRadius: BorderRadius.pill }]} />
-        <View style={[skeletonStyles.box, { width: 72, height: 24 }]} />
+        <Skeleton width={36} height={22} borderRadius={BorderRadius.pill} />
+        <Skeleton width={72} height={24} />
       </View>
     </View>
   );
@@ -229,7 +231,7 @@ export default function TaskFeedScreen({
           <Text style={styles.offersCountText}>{item.task._offersCount} הצעות</Text>
         </View>
         <View style={styles.clientInfo}>
-          <View style={[styles.trustDot, { backgroundColor: trustScoreColor(item.task.client.trustScore) }]} />
+          <Avatar name={item.task.client.displayName ?? '?'} size={22} />
           <Text style={styles.clientName}>{item.task.client.displayName}</Text>
         </View>
       </View>
@@ -491,6 +493,3 @@ const styles = StyleSheet.create({
   emptyCtaText: { ...Typography.button, color: Colors.textInverse },
 });
 
-const skeletonStyles = StyleSheet.create({
-  box: { backgroundColor: Colors.border, opacity: 0.5, borderRadius: BorderRadius.md, height: 16 },
-});

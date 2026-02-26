@@ -21,6 +21,10 @@ import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS, formatTi
 import he from '../i18n/he.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { taskApi } from '../services/api';
+import { useToast } from '../components/Toast';
+import AnimatedPressable from '../components/AnimatedPressable';
+import ThemedInput from '../components/ThemedInput';
+import ScreenHeader from '../components/ScreenHeader';
 import DateTimePicker from '../components/DateTimePicker';
 import AddressAutocomplete from '../components/AddressAutocomplete';
 
@@ -110,6 +114,7 @@ export default function PostTaskScreen({ onSuccess, onBack, editTask }: PostTask
   });
   const [errors, setErrors] = useState<Partial<Record<keyof TaskDraft, string>>>({});
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const { toast } = useToast();
 
   const update = useCallback(<K extends keyof TaskDraft>(key: K, value: TaskDraft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -165,7 +170,7 @@ export default function PostTaskScreen({ onSuccess, onBack, editTask }: PostTask
 
   const handleSubmit = async () => {
     if (!draft.latitude || !draft.longitude) {
-      Alert.alert('שגיאה', 'יש לבחור כתובת עם מיקום');
+      toast('יש לבחור כתובת עם מיקום', 'error');
       return;
     }
     setIsSubmitting(true);
@@ -188,7 +193,7 @@ export default function PostTaskScreen({ onSuccess, onBack, editTask }: PostTask
 
       if (isEditMode && token) {
         const data = await taskApi.update(editTask!.id, payload, token);
-        Alert.alert('✓', he.tasks.task_updated);
+        toast(he.tasks.task_updated, 'success');
         onSuccess(editTask!.id);
       } else {
         const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/v1/tasks`, {
@@ -202,13 +207,13 @@ export default function PostTaskScreen({ onSuccess, onBack, editTask }: PostTask
 
         const data = await res.json();
         if (!res.ok) {
-          Alert.alert('שגיאה', data.messageHe ?? he.errors.generic);
+          toast(data.messageHe ?? he.errors.generic, 'error');
           return;
         }
         onSuccess(data.task.id);
       }
     } catch {
-      Alert.alert('שגיאה', he.errors.network);
+      toast(he.errors.network, 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -221,13 +226,10 @@ export default function PostTaskScreen({ onSuccess, onBack, editTask }: PostTask
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
 
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={step > 1 ? () => setStep((s) => s - 1) : onBack}>
-          <Ionicons name="chevron-forward" size={20} color={Colors.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{isEditMode ? he.tasks.edit_task : he.tasks.post_task}</Text>
-        <View style={{ width: 36 }} />
-      </View>
+      <ScreenHeader
+        title={isEditMode ? he.tasks.edit_task : he.tasks.post_task}
+        onBack={step > 1 ? () => setStep((s) => s - 1) : onBack}
+      />
 
       {/* Progress Bar */}
       <View style={styles.progressBar}>
@@ -260,7 +262,7 @@ export default function PostTaskScreen({ onSuccess, onBack, editTask }: PostTask
 
       {/* Bottom CTA */}
       <View style={styles.footer}>
-        <TouchableOpacity
+        <AnimatedPressable
           style={[styles.nextButton, isSubmitting && styles.nextButtonDisabled]}
           onPress={handleNext}
           disabled={isSubmitting}
@@ -272,7 +274,7 @@ export default function PostTaskScreen({ onSuccess, onBack, editTask }: PostTask
               {step === TOTAL_STEPS ? (isEditMode ? he.common.save : he.tasks.post) : he.common.next}
             </Text>
           )}
-        </TouchableOpacity>
+        </AnimatedPressable>
       </View>
 
       <DateTimePicker
@@ -314,33 +316,26 @@ function StepWhat({ draft, update, errors }: any) {
 
       {/* Title */}
       <Text style={styles.fieldLabel}>{he.tasks.task_title_label}</Text>
-      <TextInput
-        style={[styles.textInput, errors.title && styles.textInputError]}
+      <ThemedInput
         value={draft.title}
         onChangeText={(v) => update('title', v)}
         placeholder={he.tasks.task_title_placeholder}
-        placeholderTextColor={Colors.textDisabled}
-        textAlign="right"
         maxLength={100}
+        error={errors.title}
       />
-      {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
       <Text style={styles.charCount}>{draft.title.length}/100</Text>
 
       {/* Description */}
       <Text style={styles.fieldLabel}>{he.tasks.task_desc_label}</Text>
-      <TextInput
-        style={[styles.textInput, styles.textArea, errors.description && styles.textInputError]}
+      <ThemedInput
         value={draft.description}
         onChangeText={(v) => update('description', v)}
         placeholder={he.tasks.task_desc_placeholder}
-        placeholderTextColor={Colors.textDisabled}
-        textAlign="right"
         multiline
         numberOfLines={5}
-        textAlignVertical="top"
         maxLength={2000}
+        error={errors.description}
       />
-      {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
     </View>
   );
 }

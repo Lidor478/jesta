@@ -22,6 +22,7 @@ import { Colors, Typography, Spacing, BorderRadius } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
 import { useLocation } from '../hooks/useLocation';
 import { userApi } from '../services/api';
+import { ToastProvider } from '../components/Toast';
 import he from '../i18n/he.json';
 
 import TaskFeedScreen from '../screens/TaskFeedScreen';
@@ -182,50 +183,52 @@ export default function MainNavigator() {
   const { user } = useAuthContext();
 
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-        animationEnabled: true,
-      }}
-    >
-      <Stack.Screen name="MainTabs" component={MainTabs} />
+    <ToastProvider>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          animationEnabled: true,
+        }}
+      >
+        <Stack.Screen name="MainTabs" component={MainTabs} />
 
-      <Stack.Screen name="TaskDetail">
-        {({ route, navigation }) => (
-          <TaskDetailScreen
-            taskId={route.params.taskId}
-            currentUserId={user?.id ?? ''}
-            onBack={() => navigation.goBack()}
-            onOfferAccepted={(transactionId) =>
-              navigation.navigate('FundEscrow', {
-                taskId: route.params.taskId,
-                offerId: '',
-                agreedPrice: 0,
-                jesterName: '',
-                taskTitle: '',
-                requiresVehicle: false,
-              })
-            }
-            onEdit={(task) => navigation.navigate('EditTask', { task })}
-          />
-        )}
-      </Stack.Screen>
+        <Stack.Screen name="TaskDetail">
+          {({ route, navigation }) => (
+            <TaskDetailScreen
+              taskId={route.params.taskId}
+              currentUserId={user?.id ?? ''}
+              onBack={() => navigation.goBack()}
+              onOfferAccepted={(transactionId) =>
+                navigation.navigate('FundEscrow', {
+                  taskId: route.params.taskId,
+                  offerId: '',
+                  agreedPrice: 0,
+                  jesterName: '',
+                  taskTitle: '',
+                  requiresVehicle: false,
+                })
+              }
+              onEdit={(task) => navigation.navigate('EditTask', { task })}
+            />
+          )}
+        </Stack.Screen>
 
-      <Stack.Screen name="EditTask">
-        {({ route, navigation }) => (
-          <PostTaskScreen
-            editTask={route.params.task}
-            onSuccess={(taskId) => {
-              navigation.goBack();
-              navigation.navigate('TaskDetail', { taskId });
-            }}
-            onBack={() => navigation.goBack()}
-          />
-        )}
-      </Stack.Screen>
+        <Stack.Screen name="EditTask">
+          {({ route, navigation }) => (
+            <PostTaskScreen
+              editTask={route.params.task}
+              onSuccess={(taskId) => {
+                navigation.goBack();
+                navigation.navigate('TaskDetail', { taskId });
+              }}
+              onBack={() => navigation.goBack()}
+            />
+          )}
+        </Stack.Screen>
 
-      <Stack.Screen name="FundEscrow" component={FundEscrowScreen} />
-      <Stack.Screen name="InvoiceViewer" component={InvoiceViewerScreen} />
-    </Stack.Navigator>
+        <Stack.Screen name="FundEscrow" component={FundEscrowScreen} />
+        <Stack.Screen name="InvoiceViewer" component={InvoiceViewerScreen} />
+      </Stack.Navigator>
+    </ToastProvider>
   );
 }

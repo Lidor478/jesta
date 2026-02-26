@@ -25,6 +25,11 @@ import {
 import he from '../i18n/he.json';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { taskApi } from '../services/api';
+import { useToast } from '../components/Toast';
+import AnimatedPressable from '../components/AnimatedPressable';
+import Skeleton from '../components/Skeleton';
+import Avatar from '../components/Avatar';
+import ScreenHeader from '../components/ScreenHeader';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -83,6 +88,7 @@ export default function TaskDetailScreen({
   const [disputeReason, setDisputeReason] = useState('');
   const [showDisputeModal, setShowDisputeModal] = useState(false);
   const [showOfferForm, setShowOfferForm] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => { loadTask(); }, [taskId]);
 
@@ -120,7 +126,7 @@ export default function TaskDetailScreen({
 
   const handleSubmitOffer = async () => {
     if (!offerPrice || parseFloat(offerPrice) < 50) {
-      Alert.alert('שגיאה', 'יש להזין מחיר של לפחות 50 ₪');
+      toast('יש להזין מחיר של לפחות 50 ₪', 'error');
       return;
     }
     setActionLoading(true);
@@ -130,11 +136,11 @@ export default function TaskDetailScreen({
         message: offerMessage || undefined,
       });
       if (data.offer) {
-        Alert.alert('✓', data.messageHe);
+        toast(data.messageHe, 'success');
         setShowOfferForm(false);
         await loadTask();
       } else {
-        Alert.alert('שגיאה', data.messageHe);
+        toast(data.messageHe, 'error');
       }
     } finally { setActionLoading(false); }
   };
@@ -151,7 +157,7 @@ export default function TaskDetailScreen({
             try {
               const data = await apiAction(`offers/${offerId}/accept`, 'PUT');
               if (data.task) {
-                Alert.alert('✓', data.messageHe);
+                toast(data.messageHe, 'success');
                 onOfferAccepted(data.transaction.id);
                 await loadTask();
               }
@@ -176,7 +182,7 @@ export default function TaskDetailScreen({
             setActionLoading(true);
             try {
               const data = await apiAction(action);
-              Alert.alert('✓', data.messageHe ?? messages[action].success);
+              toast(data.messageHe ?? messages[action].success, 'success');
               await loadTask();
             } finally { setActionLoading(false); }
           },
@@ -187,13 +193,13 @@ export default function TaskDetailScreen({
 
   const handleDispute = async () => {
     if (disputeReason.length < 10) {
-      Alert.alert('שגיאה', 'יש לפרט את הסיבה (לפחות 10 תווים)');
+      toast('יש לפרט את הסיבה (לפחות 10 תווים)', 'error');
       return;
     }
     setActionLoading(true);
     try {
       const data = await apiAction('dispute', 'POST', { reason: disputeReason });
-      Alert.alert('✓', data.messageHe);
+      toast(data.messageHe, 'success');
       setShowDisputeModal(false);
       await loadTask();
     } finally { setActionLoading(false); }
@@ -212,7 +218,7 @@ export default function TaskDetailScreen({
               await taskApi.cancel(taskId);
               onBack();
             } catch {
-              Alert.alert('שגיאה', he.errors.generic);
+              toast(he.errors.generic, 'error');
             } finally { setActionLoading(false); }
           },
         },
@@ -225,18 +231,13 @@ export default function TaskDetailScreen({
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.header}>
-          <View style={[skeletonStyles.box, { width: 80, height: 24, borderRadius: BorderRadius.pill }]} />
-          <TouchableOpacity style={styles.backButton} onPress={onBack}>
-            <Ionicons name="chevron-forward" size={24} color={Colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
+        <ScreenHeader title="" onBack={onBack} rightAction={<Skeleton width={80} height={24} borderRadius={BorderRadius.pill} />} />
         <View style={{ padding: Spacing.lg, gap: Spacing.md }}>
-          <View style={[skeletonStyles.box, { width: 100, height: 14 }]} />
-          <View style={[skeletonStyles.box, { width: '80%', height: 22 }]} />
-          <View style={[skeletonStyles.box, { width: '60%', height: 14 }]} />
-          <View style={[skeletonStyles.box, { width: '100%', height: 80, marginTop: Spacing.md }]} />
-          <View style={[skeletonStyles.box, { width: '100%', height: 56, borderRadius: BorderRadius.lg }]} />
+          <Skeleton width={100} height={14} />
+          <Skeleton width="80%" height={22} />
+          <Skeleton width="60%" height={14} />
+          <Skeleton width="100%" height={80} style={{ marginTop: Spacing.md }} />
+          <Skeleton width="100%" height={56} borderRadius={BorderRadius.lg} />
         </View>
       </SafeAreaView>
     );
@@ -261,19 +262,20 @@ export default function TaskDetailScreen({
       <StatusBar barStyle="dark-content" backgroundColor={Colors.background} />
 
       {/* Header */}
-      <View style={styles.header}>
-        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: Spacing.sm }}>
-          <StatusChip status={task.status} />
-          {isOwner && task.status === 'OPEN' && onEdit && (
-            <TouchableOpacity onPress={() => onEdit(task)} style={styles.editIconButton}>
-              <Ionicons name="create-outline" size={20} color={Colors.primary} />
-            </TouchableOpacity>
-          )}
-        </View>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Ionicons name="chevron-forward" size={24} color={Colors.textSecondary} />
-        </TouchableOpacity>
-      </View>
+      <ScreenHeader
+        title=""
+        onBack={onBack}
+        rightAction={
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: Spacing.sm }}>
+            <StatusChip status={task.status} />
+            {isOwner && task.status === 'OPEN' && onEdit && (
+              <TouchableOpacity onPress={() => onEdit(task)} style={styles.editIconButton}>
+                <Ionicons name="create-outline" size={20} color={Colors.primary} />
+              </TouchableOpacity>
+            )}
+          </View>
+        }
+      />
 
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
 
@@ -505,11 +507,7 @@ function UserRow({ user, label }: { user: any; label: string }) {
   return (
     <View style={styles.userRow}>
       <View style={styles.userInfo}>
-        <View style={[styles.trustBadge, { backgroundColor: trustScoreColor(user.trustScore) + '20' }]}>
-          <Text style={[styles.trustScore, { color: trustScoreColor(user.trustScore) }]}>
-            {Math.round(user.trustScore)}
-          </Text>
-        </View>
+        <Avatar name={user.displayName ?? '?'} size={44} trustScore={user.trustScore} />
         <View>
           <Text style={styles.userName}>{user.displayName}</Text>
           <Text style={styles.userVerification}>{user.verificationLevel}</Text>
@@ -568,9 +566,9 @@ function OfferForm({ price, message, onPriceChange, onMessageChange, onSubmit, o
           תקבל: {formatNIS(parseFloat(price) * 0.85)} (אחרי עמלה של 15%)
         </Text>
       )}
-      <TouchableOpacity style={styles.primaryButton} onPress={onSubmit} disabled={isLoading}>
+      <AnimatedPressable style={styles.primaryButton} onPress={onSubmit} disabled={isLoading}>
         {isLoading ? <ActivityIndicator color={Colors.textInverse} /> : <Text style={styles.primaryButtonText}>שלח הצעה</Text>}
-      </TouchableOpacity>
+      </AnimatedPressable>
       <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
         <Text style={styles.cancelButtonText}>{he.common.cancel}</Text>
       </TouchableOpacity>
@@ -686,6 +684,3 @@ const styles = StyleSheet.create({
   cancelTaskButtonText: { ...Typography.button, color: Colors.error },
 });
 
-const skeletonStyles = StyleSheet.create({
-  box: { backgroundColor: Colors.border, opacity: 0.5, borderRadius: BorderRadius.md, height: 16 },
-});

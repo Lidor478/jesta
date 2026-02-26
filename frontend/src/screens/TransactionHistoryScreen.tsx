@@ -30,6 +30,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, formatNIS, formatDate } from '../theme/rtl';
 import { useAuthContext } from '../hooks/useAuth';
 import { api } from '../services/api';
+import ScreenHeader from '../components/ScreenHeader';
 import he from '../i18n/he.json';
 
 // ─────────────────────────────────────────────
@@ -271,12 +272,8 @@ export default function TransactionHistoryScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="chevron-forward" size={20} color={Colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>היסטוריית עסקאות</Text>
-        <View style={{ width: 36 }} />
+      <View style={{ paddingTop: 40 }}>
+        <ScreenHeader title="היסטוריית עסקאות" onBack={() => navigation.goBack()} />
       </View>
 
       {/* Role toggle */}
